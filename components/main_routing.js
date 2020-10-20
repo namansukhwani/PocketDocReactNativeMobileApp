@@ -15,7 +15,8 @@ export default function Main(){
                     name="login"
                     options={{
                         title:'Login',
-                        headerTitleAlign:'center'
+                        headerTitleAlign:'center',
+                        headerShown:false
                     }}
                     component={Login}
                 />
