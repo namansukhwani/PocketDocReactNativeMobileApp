@@ -4,14 +4,19 @@ import {Button, Headline, Subheading,TextInput} from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as Animatable from 'react-native-animatable';
 import auth from '@react-native-firebase/auth';
+import { or } from 'react-native-reanimated';
 
 
-export default function Login(props){
+export default function SignUp(props){
 
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPass, setConfirmPass] = useState('');
     const [error1, setError1] = useState(false)
     const [error2, setError2] = useState(false)
+    const [error3, setError3] = useState(false)
+    const [error4, setError4] = useState(false)
 
     useEffect(()=>{
         const userChangeListner=auth().onAuthStateChanged((user)=>{
@@ -25,9 +30,14 @@ export default function Login(props){
         return userChangeListner;
     },[]);
 
-    const handelLogin=()=>{
+    const handelSignUp=()=>{
         const regexEmail=/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/;
 
+        if(name.length < 4 || name.length > 20 ){
+            setError3(true);
+            ToastAndroid.show("Name must be minimum 4 and maximum 20 characters.",ToastAndroid.LONG);
+            return;
+        }
         if(email===''){
             setError1(true);
             ToastAndroid.show("Email field can\'t be empty.",ToastAndroid.LONG);
@@ -48,13 +58,34 @@ export default function Login(props){
             ToastAndroid.show("Password must be minimum 4 and maximum 14 characters.",ToastAndroid.LONG);
             return;
         } 
-
+        if(password!==confirmPass){
+            setError4(true);
+            ToastAndroid.show("Re-enterd password doesn\'t match.",ToastAndroid.LONG);
+            return;
+        }
+        
         auth()
-        .signInWithEmailAndPassword(email,password)
+        .createUserWithEmailAndPassword(email,password)
         .then((user) => {
+            user.user.sendEmailVerification()
+            .then(response=>{
+                console.log("email varification sent ",response);
+            })
+            .catch(err=>{
+                console.log("error",err);
+            });
+            user.user.updateProfile({
+                displayName:name, 
+            })
+            .then(user=>{
+                props.navigation.navigate("home",{user:auth().currentUser.providerData});
+            })
+            .catch(err=>{
+                console.log(err);
+            })
             console.log('User account created & signed in!');
             console.log("User :",user.user.email);
-            props.navigation.navigate("home",{user:user.user.providerData});
+            //props.navigation.navigate("home",{user:user.user.providerData});
         })
         .catch(error => {
             if (error.code === 'auth/email-already-in-use') {
@@ -65,11 +96,9 @@ export default function Login(props){
             console.log('That email address is invalid!');
             }
 
-            if (error.code === 'auth/user-not-found') {
-                console.log('User with this email dosent exist');
-            }
+            
 
-            console.error(error);
+            console.error("error",error);
         });
     };
 
@@ -78,12 +107,28 @@ export default function Login(props){
             <View style={styles.background} />
             <StatusBar backgroundColor="#147EFB" barStyle="light-content" />
             <View style={styles.con} >
-                <Headline style={styles.heading}>Welcome!!</Headline>
-                <Subheading style={{color:'#fff'}}><Subheading style={{color:'#fff',fontWeight:'bold'}}>Pocket Doc </Subheading>is a complete solution for ons's personal health.</Subheading>
+                <Headline style={styles.heading}>Hello 👋 </Headline>
+                <Subheading style={{color:'#fff'}}>Welocome to Pocket Doc a complete solution for your personal health.</Subheading>
+                <Subheading style={{color:'#fff',fontWeight:'bold'}}>Sign Up below to continue.</Subheading>
                 <Animatable.View style={styles.card} animation="slideInUp" duration={700} delay={150} useNativeDriver={true}>
                     <KeyboardAwareScrollView enableOnAndroid={true} extraHeight={58} style={{backgroundColor:"#fff"}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
-                        <Image source={require('../assets/login_icon.png')} style={{width:120,height:120,resizeMode:"contain",alignSelf:'center'}} />
-                        <Headline style={styles.loginText}>Login</Headline>
+                        <Headline style={styles.loginText}>Sign Up</Headline>
+                        <TextInput
+                            mode="outlined"
+                            label="Full Name*"
+                            value={name}
+                            onChangeText={(text)=>{
+                                if(error3){
+                                    setError3(false);
+                                }
+                                setName(text);
+                            }}
+                            placeholder="Full name"
+                            style={{backgroundColor:"#fff",marginTop:10}}
+                            theme={{colors:{primary:"#147EFB"}}}
+                            left={<TextInput.Icon name="account" color="#147EFB"/>}
+                            error={error3}
+                        />
                         <TextInput
                             mode="outlined"
                             label="Email Address*"
@@ -97,7 +142,7 @@ export default function Login(props){
                             placeholder="example@some.com"
                             style={{backgroundColor:"#fff",marginTop:10}}
                             theme={{colors:{primary:"#147EFB"}}}
-                            left={<TextInput.Icon name="account" color="#147EFB"/>}
+                            left={<TextInput.Icon name="email" color="#147EFB"/>}
                             error={error1}
                         />
                         <TextInput
@@ -117,8 +162,24 @@ export default function Login(props){
                             secureTextEntry={true}
                             error={error2}
                         />
-                        <Button mode="text" style={{width:190,alignSelf:'center'}} color="#147EFB" compact={true} onPress={()=>console.log("forgot pass")}>Forgot Password?</Button>
-                        <Button mode="contained" icon="arrow-right-circle" style={{marginTop:35}} color="#147EFB" onPress={()=>handelLogin()}>LOGIN</Button>
+                        <TextInput
+                            mode="outlined"
+                            label="Re-enter Password*"
+                            value={confirmPass}
+                            onChangeText={(text)=>{
+                                if(error4){
+                                    setError4(false);
+                                }
+                                setConfirmPass(text);
+                            }}
+                            placeholder="Re-enter Password"
+                            style={{backgroundColor:"#fff",marginTop:10}}
+                            theme={{colors:{primary:"#147EFB"}}}
+                            left={<TextInput.Icon name="lock" color="#147EFB"/>}
+                            secureTextEntry={true}
+                            error={error4}
+                        />
+                        <Button mode="contained" icon="account-plus" style={{marginTop:35}} color="#147EFB" onPress={()=>handelSignUp()}>SIGN UP</Button>
                     </KeyboardAwareScrollView>
                     {/*<View style={styles.loginButton}>
                         <IconButton
@@ -132,8 +193,8 @@ export default function Login(props){
                     
                 </Animatable.View>
                 <View style={styles.footer}>
-                    <Subheading style={{alignSelf:"center",margin:10}} >Don't have an account ?</Subheading>
-                    <Button mode="text" style={{width:90,alignSelf:"center",marginBottom:10}} color="#147EFB" compact={true} onPress={()=>props.navigation.navigate("signUp")}>Sign Up</Button>
+                    <Subheading style={{alignSelf:"center",margin:10}} >Already have an account ?</Subheading>
+                    <Button mode="text" style={{width:90,alignSelf:"center",marginBottom:10}} color="#147EFB" compact={true} onPress={()=>props.navigation.goBack()}>LOGIN</Button>
                     
                 </View>
             </View>
@@ -173,7 +234,7 @@ const styles=StyleSheet.create({
     heading:{
         color:"#fff",
         fontSize:30,
-        marginTop:"6%",
+        marginTop:"2%",
         fontWeight:'bold'
     },
     loginText:{
