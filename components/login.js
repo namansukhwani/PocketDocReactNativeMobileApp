@@ -58,28 +58,36 @@ export default function Login(props){
         })
         .catch(error => {
             if (error.code === 'auth/email-already-in-use') {
-            console.log('That email address is already in use!');
+                console.log('That email address is already in use!');
+                ToastAndroid.show("That email address is already in use!",ToastAndroid.LONG);
             }
 
             if (error.code === 'auth/invalid-email') {
-            console.log('That email address is invalid!');
+                console.log('That email address is invalid!');
+                ToastAndroid.show("That email address is invalid!",ToastAndroid.LONG);
             }
 
             if (error.code === 'auth/user-not-found') {
                 console.log('User with this email dosent exist');
+                ToastAndroid.show("User with this email dosent exist",ToastAndroid.LONG);
             }
 
-            console.error(error);
+            if (error.code === 'auth/wrong-password') {
+                console.log('Password is incorrect');
+                ToastAndroid.show("Password is incorrect",ToastAndroid.LONG);
+            }
+
+            console.log(error);
         });
     };
 
     return(
         <View style={styles.container} keyboardShouldPersistTaps={true}>
             <View style={styles.background} />
-            <StatusBar backgroundColor="#147EFB" barStyle="light-content" />
+            <StatusBar backgroundColor="#fff" barStyle="dark-content" />
             <View style={styles.con} >
                 <Headline style={styles.heading}>Welcome!!</Headline>
-                <Subheading style={{color:'#fff'}}><Subheading style={{color:'#fff',fontWeight:'bold'}}>Pocket Doc </Subheading>is a complete solution for ons's personal health.</Subheading>
+                <Subheading style={{color:'#000'}}><Subheading style={{color:'#000',fontWeight:'bold'}}>Pocket Doc </Subheading>is a complete solution for ons's personal health.</Subheading>
                 <Animatable.View style={styles.card} animation="slideInUp" duration={700} delay={150} useNativeDriver={true}>
                     <KeyboardAwareScrollView enableOnAndroid={true} extraHeight={58} style={{backgroundColor:"#fff"}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
                         <Image source={require('../assets/login_icon.png')} style={{width:120,height:120,resizeMode:"contain",alignSelf:'center'}} />
@@ -117,7 +125,7 @@ export default function Login(props){
                             secureTextEntry={true}
                             error={error2}
                         />
-                        <Button mode="text" style={{width:190,alignSelf:'center'}} color="#147EFB" compact={true} onPress={()=>console.log("forgot pass")}>Forgot Password?</Button>
+                        <Button mode="text" style={{width:190,alignSelf:'center'}} color="#147EFB" compact={true} onPress={()=>props.navigation.navigate("forgotPassword",{email:email})}>Forgot Password?</Button>
                         <Button mode="contained" icon="arrow-right-circle" style={{marginTop:35}} color="#147EFB" onPress={()=>handelLogin()}>LOGIN</Button>
                     </KeyboardAwareScrollView>
                     {/*<View style={styles.loginButton}>
@@ -133,7 +141,7 @@ export default function Login(props){
                 </Animatable.View>
                 <View style={styles.footer}>
                     <Subheading style={{alignSelf:"center",margin:10}} >Don't have an account ?</Subheading>
-                    <Button mode="text" style={{width:90,alignSelf:"center",marginBottom:10}} color="#147EFB" compact={true} onPress={()=>props.navigation.navigate("signUp")}>Sign Up</Button>
+                    <Button mode="text" style={{width:90,alignSelf:"center",marginBottom:10}} color="#147EFB" compact={true} onPress={()=>props.navigation.navigate("signUp")}>REGISTER</Button>
                     
                 </View>
             </View>
@@ -163,7 +171,7 @@ const styles=StyleSheet.create({
         position:'absolute',
         elevation:-10,
         zIndex:-10,
-        backgroundColor:"#147EFB",
+        backgroundColor:"#fff",
         top:0,
         left:0,
         right:0,
@@ -171,7 +179,7 @@ const styles=StyleSheet.create({
         height:300
     },
     heading:{
-        color:"#fff",
+        color:"#147efb",
         fontSize:30,
         marginTop:"6%",
         fontWeight:'bold'

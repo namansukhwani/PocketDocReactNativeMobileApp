@@ -4,8 +4,6 @@ import {Button, Headline, Subheading,TextInput} from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as Animatable from 'react-native-animatable';
 import auth from '@react-native-firebase/auth';
-import { or } from 'react-native-reanimated';
-
 
 export default function SignUp(props){
 
@@ -73,9 +71,12 @@ export default function SignUp(props){
             })
             .catch(err=>{
                 console.log("error",err);
+                ToastAndroid.show("Unable to send Verification Email try again later.",ToastAndroid.LONG);
+                return;
             });
             user.user.updateProfile({
-                displayName:name, 
+                displayName:name,
+                photoURL:"user"
             })
             .then(user=>{
                 props.navigation.navigate("home",{user:auth().currentUser.providerData});
@@ -90,15 +91,17 @@ export default function SignUp(props){
         .catch(error => {
             if (error.code === 'auth/email-already-in-use') {
             console.log('That email address is already in use!');
+            ToastAndroid.show("That email address is already in use!",ToastAndroid.LONG);
             }
 
             if (error.code === 'auth/invalid-email') {
             console.log('That email address is invalid!');
+            ToastAndroid.show("That email address is invalid!",ToastAndroid.LONG);
             }
 
             
 
-            console.error("error",error);
+            console.log("error",error);
         });
     };
 
@@ -109,10 +112,10 @@ export default function SignUp(props){
             <View style={styles.con} >
                 <Headline style={styles.heading}>Hello 👋 </Headline>
                 <Subheading style={{color:'#fff'}}>Welocome to Pocket Doc a complete solution for your personal health.</Subheading>
-                <Subheading style={{color:'#fff',fontWeight:'bold'}}>Sign Up below to continue.</Subheading>
-                <Animatable.View style={styles.card} animation="slideInUp" duration={700} delay={150} useNativeDriver={true}>
+                <Subheading style={{color:'#fff',fontWeight:'bold'}}>Register below to continue.</Subheading>
+                <Animatable.View style={styles.card} animation="slideInUp" duration={700} delay={70} useNativeDriver={true}>
                     <KeyboardAwareScrollView enableOnAndroid={true} extraHeight={58} style={{backgroundColor:"#fff"}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
-                        <Headline style={styles.loginText}>Sign Up</Headline>
+                        <Headline style={styles.loginText}>Register</Headline>
                         <TextInput
                             mode="outlined"
                             label="Full Name*"
@@ -194,7 +197,7 @@ export default function SignUp(props){
                 </Animatable.View>
                 <View style={styles.footer}>
                     <Subheading style={{alignSelf:"center",margin:10}} >Already have an account ?</Subheading>
-                    <Button mode="text" style={{width:90,alignSelf:"center",marginBottom:10}} color="#147EFB" compact={true} onPress={()=>props.navigation.goBack()}>LOGIN</Button>
+                    <Button mode="text" style={{width:90,alignSelf:"center",marginBottom:10}} color="#147EFB" compact={true} onPress={()=>props.navigation.navigate("login")}>LOGIN</Button>
                     
                 </View>
             </View>

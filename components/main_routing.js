@@ -6,6 +6,7 @@ import {} from '@react-navigation/bottom-tabs';
 import Login from './login';
 import Home from './home';
 import SignUp from './signUp';
+import ForgotPassword from './forgotPassword';
 
 const Stack=createStackNavigator();
 
@@ -30,6 +31,15 @@ export default function Main(){
                         headerShown:false
                     })}
                     component={SignUp}
+                />
+                <Stack.Screen
+                    name="forgotPassword"
+                    options={({route,navigation})=>({
+                        headerTitle:'',
+                        headerTransparent:true,
+                        headerTitleAlign:'center',
+                    })}
+                    component={ForgotPassword}
                 />
                 <Stack.Screen
                     name="home"
