@@ -32,15 +32,23 @@ export default function ForgotPassword(props){
                 props.navigation.navigate('login');
             },300)
         })
-        .catch(err=>{
-            ToastAndroid.show("Email not registered");
-            console.log(err);
+        .catch(error=>{
+            if (error.code === 'auth/invalid-email') {
+                console.log('That email address is invalid!');
+                ToastAndroid.show("That email address is invalid!",ToastAndroid.LONG);
+            }
+            if (error.code === 'auth/user-not-found') {
+                console.log('This email is not registered!');
+                ToastAndroid.show("This email is not registered!",ToastAndroid.LONG);
+            }
+            console.log(error);
         })
     }
 
     return(
-        <Animatable.View style={styles.container} animation="slideInUp" duration={700} useNativeDriver={true}>
+        <View style={{flex:1,backgroundColor:"#fff"}}>
             <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+                <Animatable.View style={styles.container} animation="slideInUp" duration={700} useNativeDriver={true}>
                 <Icon style={{alignSelf:'center'}} name="lock-reset" size={90} color="#147EFB" />
                 <Headline style={{fontSize:26,alignSelf:'center',fontWeight:"bold",color:"#147efb",marginTop:20}}>Forgot Password?</Headline>
                 <Subheading style={{marginTop:8,textAlign:'center',width:"80%",alignSelf:'center'}}>We just need your registered email address to sent you password reset.</Subheading>
@@ -61,11 +69,12 @@ export default function ForgotPassword(props){
                     error={error1}
                 />
                 <Button mode="contained" style={{marginTop:35,height:50,justifyContent:'center',marginBottom:'14%'}} color="#147EFB" onPress={()=>handelReset()}>Send password Reset</Button>
+                </Animatable.View>
                 <View style={styles.footer}>
                     <Subheading style={{alignSelf:"center",margin:10}} >Don't have an account ?</Subheading>
                     <Button mode="text" style={{width:90,alignSelf:"center",marginBottom:10}} color="#147EFB" compact={true} onPress={()=>props.navigation.navigate("signUp")}>REGISTER</Button> 
                 </View>
-         </Animatable.View>
+         </View>
 
     )
 
@@ -76,7 +85,7 @@ const styles=StyleSheet.create({
         flex:1,
         backgroundColor:'#fff',
         justifyContent:'center',
-        padding:20
+        padding:20,
     },
     footer:{
         position:'absolute',

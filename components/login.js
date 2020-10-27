@@ -1,10 +1,9 @@
 import React,{useEffect, useState} from 'react';
 import {View,StyleSheet,StatusBar,Image,ToastAndroid} from 'react-native';
-import {Button, Headline, Subheading,TextInput} from 'react-native-paper';
+import {Button, Headline,Subheading,TextInput} from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as Animatable from 'react-native-animatable';
 import auth from '@react-native-firebase/auth';
-
 
 export default function Login(props){
 
@@ -12,13 +11,26 @@ export default function Login(props){
     const [password, setPassword] = useState('');
     const [error1, setError1] = useState(false)
     const [error2, setError2] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [showPass, setShowPass] = useState(false);
 
     useEffect(()=>{
+
         const userChangeListner=auth().onAuthStateChanged((user)=>{
             console.log(user);
-            if(user!==null){
-                props.navigation.navigate("home",{user:user.providerData});
-            }
+            
+                if(user!==null){
+                    if(user.photoURL==="user"){
+                        if(user.emailVerified){
+                            props.navigation.navigate("home",{user:user.providerData});
+                        }
+                        else{
+                            props.navigation.navigate("emailVerification");
+                        }
+                        
+                    }
+                }
+
             //console.log(auth().currentUser.emailVerified)
         })
 
@@ -26,26 +38,31 @@ export default function Login(props){
     },[]);
 
     const handelLogin=()=>{
+        setLoading(true);
         const regexEmail=/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/;
 
         if(email===''){
             setError1(true);
             ToastAndroid.show("Email field can\'t be empty.",ToastAndroid.LONG);
+            setLoading(false);
             return;
         }
         if(!regexEmail.test(email)){
             setError1(true);
             ToastAndroid.show("Invalid email address.",ToastAndroid.LONG);
+            setLoading(false);
             return;
         }
         if(password===''){
             setError2(true);
             ToastAndroid.show("Password field can\'t be empty.",ToastAndroid.LONG);
+            setLoading(false);
             return;
         }
         if(password.length < 4 || password.length > 14){
             setError2(true);
             ToastAndroid.show("Password must be minimum 4 and maximum 14 characters.",ToastAndroid.LONG);
+            setLoading(false);
             return;
         } 
 
@@ -54,35 +71,72 @@ export default function Login(props){
         .then((user) => {
             console.log('User account created & signed in!');
             console.log("User :",user.user.email);
-            props.navigation.navigate("home",{user:user.user.providerData});
+            if(user.user.photoURL!=="user"){
+                auth().signOut()
+                .then(()=>{
+                    if(user.user.photoURL==="doctor"){
+                        console.log("This is a doctor ID");
+                    }
+                    if(user.user.photoURL==="hospital"){
+                        console.log("This is a hospital ID");
+                    }
+                    setLoading(false);
+                    return;
+                })
+                .catch(err=>console.log("logout ERROR"))
+            }
+            else{
+                user.user.getIdToken()
+                .then(token=>{
+                    console.log("Token ::: ",token)
+                })
+                .catch(err=>{
+                    console.log("error in token :",err);
+                })
+                setEmail('');
+                setPassword('');
+                setLoading(false);
+                if(user.user.emailVerified){
+                    props.navigation.navigate("home",{user:user.user.providerData});
+                }
+                else{
+                    props.navigation.navigate("emailVerification");
+                }
+                //props.navigation.navigate("home",{user:user.user.providerData});
+            }
+           
         })
         .catch(error => {
             if (error.code === 'auth/email-already-in-use') {
                 console.log('That email address is already in use!');
                 ToastAndroid.show("That email address is already in use!",ToastAndroid.LONG);
+      
             }
 
             if (error.code === 'auth/invalid-email') {
                 console.log('That email address is invalid!');
                 ToastAndroid.show("That email address is invalid!",ToastAndroid.LONG);
+          
             }
 
             if (error.code === 'auth/user-not-found') {
                 console.log('User with this email dosent exist');
                 ToastAndroid.show("User with this email dosent exist",ToastAndroid.LONG);
+            
             }
 
             if (error.code === 'auth/wrong-password') {
                 console.log('Password is incorrect');
                 ToastAndroid.show("Password is incorrect",ToastAndroid.LONG);
+                
             }
-
+            setLoading(false);
             console.log(error);
         });
     };
 
     return(
-        <View style={styles.container} keyboardShouldPersistTaps={true}>
+        <View style={styles.container}>
             <View style={styles.background} />
             <StatusBar backgroundColor="#fff" barStyle="dark-content" />
             <View style={styles.con} >
@@ -122,11 +176,12 @@ export default function Login(props){
                             style={{backgroundColor:"#fff",marginTop:10}}
                             theme={{colors:{primary:"#147EFB"}}}
                             left={<TextInput.Icon name="lock" color="#147EFB"/>}
-                            secureTextEntry={true}
+                            right={<TextInput.Icon name={showPass ? "eye" : "eye-off"} color="#147EFB" onPress={()=>setShowPass(!showPass)} />}
+                            secureTextEntry={!showPass}
                             error={error2}
                         />
                         <Button mode="text" style={{width:190,alignSelf:'center'}} color="#147EFB" compact={true} onPress={()=>props.navigation.navigate("forgotPassword",{email:email})}>Forgot Password?</Button>
-                        <Button mode="contained" icon="arrow-right-circle" style={{marginTop:35}} color="#147EFB" onPress={()=>handelLogin()}>LOGIN</Button>
+                        <Button mode="contained" loading={loading} icon="arrow-right-circle" style={{marginTop:35}} color="#147EFB" onPress={()=>handelLogin()}>LOGIN</Button>
                     </KeyboardAwareScrollView>
                     {/*<View style={styles.loginButton}>
                         <IconButton

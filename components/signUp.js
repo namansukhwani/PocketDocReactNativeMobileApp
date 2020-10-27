@@ -15,73 +15,65 @@ export default function SignUp(props){
     const [error2, setError2] = useState(false)
     const [error3, setError3] = useState(false)
     const [error4, setError4] = useState(false)
-
-    useEffect(()=>{
-        const userChangeListner=auth().onAuthStateChanged((user)=>{
-            console.log(user);
-            if(user!==null){
-                props.navigation.navigate("home",{user:user.providerData});
-            }
-            //console.log(auth().currentUser.emailVerified)
-        })
-
-        return userChangeListner;
-    },[]);
+    const [showPass1, setShowPass1] = useState(false);
+    const [showPass2, setShowPass2] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handelSignUp=()=>{
+        setLoading(true);
         const regexEmail=/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/;
 
         if(name.length < 4 || name.length > 20 ){
             setError3(true);
             ToastAndroid.show("Name must be minimum 4 and maximum 20 characters.",ToastAndroid.LONG);
+            setLoading(false);
             return;
         }
         if(email===''){
             setError1(true);
             ToastAndroid.show("Email field can\'t be empty.",ToastAndroid.LONG);
+            setLoading(false);
             return;
         }
         if(!regexEmail.test(email)){
             setError1(true);
             ToastAndroid.show("Invalid email address.",ToastAndroid.LONG);
+            setLoading(false);
             return;
         }
         if(password===''){
             setError2(true);
             ToastAndroid.show("Password field can\'t be empty.",ToastAndroid.LONG);
+            setLoading(false);
             return;
         }
         if(password.length < 4 || password.length > 14){
             setError2(true);
             ToastAndroid.show("Password must be minimum 4 and maximum 14 characters.",ToastAndroid.LONG);
+            setLoading(false);
             return;
         } 
         if(password!==confirmPass){
             setError4(true);
             ToastAndroid.show("Re-enterd password doesn\'t match.",ToastAndroid.LONG);
+            setLoading(false);
             return;
         }
         
         auth()
         .createUserWithEmailAndPassword(email,password)
         .then((user) => {
-            user.user.sendEmailVerification()
-            .then(response=>{
-                console.log("email varification sent ",response);
-            })
-            .catch(err=>{
-                console.log("error",err);
-                ToastAndroid.show("Unable to send Verification Email try again later.",ToastAndroid.LONG);
-                return;
-            });
+            
             user.user.updateProfile({
                 displayName:name,
                 photoURL:"user"
             })
             .then(user=>{
-                props.navigation.navigate("home",{user:auth().currentUser.providerData});
+                setLoading(false);
+                props.navigation.navigate("emailVerification");
             })
             .catch(err=>{
+                setLoading(false);
                 console.log(err);
             })
             console.log('User account created & signed in!');
@@ -89,6 +81,7 @@ export default function SignUp(props){
             //props.navigation.navigate("home",{user:user.user.providerData});
         })
         .catch(error => {
+            setLoading(false);
             if (error.code === 'auth/email-already-in-use') {
             console.log('That email address is already in use!');
             ToastAndroid.show("That email address is already in use!",ToastAndroid.LONG);
@@ -162,7 +155,8 @@ export default function SignUp(props){
                             style={{backgroundColor:"#fff",marginTop:10}}
                             theme={{colors:{primary:"#147EFB"}}}
                             left={<TextInput.Icon name="lock" color="#147EFB"/>}
-                            secureTextEntry={true}
+                            right={<TextInput.Icon name={showPass1 ? "eye" : "eye-off"} color="#147EFB" onPress={()=>setShowPass1(!showPass1)} />}
+                            secureTextEntry={!showPass1}
                             error={error2}
                         />
                         <TextInput
@@ -179,10 +173,11 @@ export default function SignUp(props){
                             style={{backgroundColor:"#fff",marginTop:10}}
                             theme={{colors:{primary:"#147EFB"}}}
                             left={<TextInput.Icon name="lock" color="#147EFB"/>}
-                            secureTextEntry={true}
+                            right={<TextInput.Icon name={showPass2 ? "eye" : "eye-off"} color="#147EFB" onPress={()=>setShowPass2(!showPass2)} />}
+                            secureTextEntry={!showPass2}
                             error={error4}
                         />
-                        <Button mode="contained" icon="account-plus" style={{marginTop:35}} color="#147EFB" onPress={()=>handelSignUp()}>SIGN UP</Button>
+                        <Button mode="contained" loading={loading} icon="account-plus" style={{marginTop:35}} color="#147EFB" onPress={()=>handelSignUp()}>SIGN UP</Button>
                     </KeyboardAwareScrollView>
                     {/*<View style={styles.loginButton}>
                         <IconButton
