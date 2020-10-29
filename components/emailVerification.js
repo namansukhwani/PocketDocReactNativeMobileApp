@@ -38,7 +38,7 @@ export default function EmailVerification(props){
                         if(auth().currentUser.emailVerified){
                             setVerified(true);
                             setTimeout(()=>{
-                                props.navigation.navigate("home",{user:auth().currentUser.providerData});
+                                props.navigation.navigate("getNewUserData",{user:auth().currentUser.providerData});
                             },2000);
                             clearInterval(interval);
                         }

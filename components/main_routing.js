@@ -40,12 +40,28 @@ export default function Main(){
                     name="getNewUserData"
                     options={({route,navigation})=>({
                         //headerShown:false,
-                        headerTitle:'',
-                        headerTransparent:true,
+                        headerTitle:'User Information',
+                        //headerTransparent:true,
+                       
                         headerTitleAlign:'center',
                         headerLeft:()=>(
                             <TouchableOpacity style={{flex:1,justifyContent:'center',alignItems:'center',marginLeft:10}} onPress={()=>navigation.goBack()}>
-                                <Icon name="chevron-back" size={30} onPress={()=>navigation.goBack()} />
+                            <Icon 
+                                name="chevron-back" 
+                                size={30} 
+                                onPress={()=>{
+                                    Alert.alert( 
+                                        "Go Back",
+                                        "Are you sure you want to sign out.",
+                                        [
+                                            {
+                                            text: "Cancel",style: "cancel"},
+                                            { text: "GO BACK", onPress: () =>{auth().signOut().then(()=>console.log("singed out")).catch(err=>console.log(err));navigation.goBack()}}
+                                        ],
+                                        { cancelable: false });
+                                    //ToastAndroid.show("You can verify your mail anytime.")
+                                    }}
+                                    />
                             </TouchableOpacity>
                         ),
                     })}

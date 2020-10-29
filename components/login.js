@@ -3,7 +3,10 @@ import {View,StyleSheet,StatusBar,Image,ToastAndroid} from 'react-native';
 import {Button, Headline,Subheading,TextInput} from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as Animatable from 'react-native-animatable';
+import LoadingScreen from './loadingScreen';
 import auth from '@react-native-firebase/auth';
+
+const url="https://pdoc-api.herokuapp.com/";
 
 export default function Login(props){
 
@@ -11,6 +14,7 @@ export default function Login(props){
     const [password, setPassword] = useState('');
     const [error1, setError1] = useState(false)
     const [error2, setError2] = useState(false)
+    const [checkingLogin, setCheckingLogin] = useState(true);
     const [loading, setLoading] = useState(false);
     const [showPass, setShowPass] = useState(false);
 
@@ -20,9 +24,10 @@ export default function Login(props){
             console.log(user);
             
                 if(user!==null){
+                    auth().currentUser.reload();
                     if(user.photoURL==="user"){
                         if(user.emailVerified){
-                            props.navigation.navigate("home",{user:user.providerData});
+                            checkUserData(user.uid,true);
                         }
                         else{
                             props.navigation.navigate("emailVerification");
@@ -36,6 +41,30 @@ export default function Login(props){
 
         return userChangeListner;
     },[]);
+
+    const checkUserData=(uid,first)=>{
+        fetch(url+`/users/${uid}`,{
+            method:"GET",
+            headers:new Headers({
+                'Origin':'https://PocketDocOnly.com',
+                'Content-Type':'application/json'
+            }),
+        })
+        .then(res=>res.json())
+        .then(response=>{
+            if(!response.status){
+                if(first){setCheckingLogin(false);}
+                props.navigation.navigate("getNewUserData",{user:auth().currentUser.providerData});
+            }
+            else{
+                if(first){setCheckingLogin(false);}
+                props.navigation.navigate("home",{user:auth().currentUser.providerData});
+            }
+        })
+        .catch(err=>{
+            console.log('Error APi: ',err);
+        })
+    }
 
     const handelLogin=()=>{
         setLoading(true);
@@ -97,7 +126,8 @@ export default function Login(props){
                 setPassword('');
                 setLoading(false);
                 if(user.user.emailVerified){
-                    props.navigation.navigate("home",{user:user.user.providerData});
+                    checkUserData(user.user.uid,false);
+                    //props.navigation.navigate("home",{user:user.user.providerData});
                 }
                 else{
                     props.navigation.navigate("emailVerification");
@@ -134,6 +164,12 @@ export default function Login(props){
             console.log(error);
         });
     };
+
+    if(checkingLogin){
+        return(
+            <LoadingScreen backgroundColor="#fff" color="#147EFB"/>
+        )
+    }
 
     return(
         <View style={styles.container}>
