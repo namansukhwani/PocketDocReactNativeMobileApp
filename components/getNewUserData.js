@@ -6,10 +6,11 @@ import auth from '@react-native-firebase/auth';
 import Spinner from 'react-native-spinkit';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 
 export default function GetNewUserData(props){
     
-    const userData=props.route.params.user[0];
+    const userData=auth().currentUser.providerData[0];
 
     const [name, setName] = useState(userData.displayName);
     const [email, setEmail] = useState(userData.email);
@@ -91,8 +92,9 @@ export default function GetNewUserData(props){
                         left={<TextInput.Icon name="phone" color="#147EFB"/>}
                     />
                     <Subheading style={{marginTop:10,fontWeight:'bold'}}>Gender</Subheading>
-                    <View style={{flexDirection:'row'}}>
+                    <View style={{flexDirection:"row"}}>
                         <RadioButton.Group value={gender} onValueChange={(value)=>setGender(value)}>
+                            <View style={{flexDirection:'row'}}>
                             <RadioButton.Item 
                                 label="Male"
                                 value="male"
@@ -114,11 +116,12 @@ export default function GetNewUserData(props){
                                 color="#147efb"
                                 style={styles.radio}
                             />
+                            </View>
                         </RadioButton.Group>
                     </View>
                     
                     <Subheading style={{marginTop:10,fontWeight:'bold'}}>DOB*</Subheading>
-                    <Button mode='outlined' style={{justifyContent:'center'}} color="#000" onPress={()=>{setShowDatePicker(true)}}>{"4 January 2000"}</Button>
+                    <Button mode='outlined' style={{justifyContent:'center'}} color="#000" onPress={()=>{setShowDatePicker(true)}}>{moment(dob).format('Do MMMM YYYY')}</Button>
                     
                     <Subheading style={{marginTop:10,fontWeight:'bold'}}>Address</Subheading>
                     <TextInput
@@ -212,14 +215,26 @@ export default function GetNewUserData(props){
                     <View style={{marginBottom:65}} />
                 </KeyboardAwareScrollView>
             </Animatable.View>
-            <Button mode="contained" loading={loading} style={styles.button} color="#147EFB" onPress={()=>{}}>Complete Registration</Button>
+            <Button mode="contained" loading={loading} style={styles.button} color="#147EFB" onPress={()=>{props.navigation.navigate("SetProfilePic")}}>Complete Registration</Button>
             {showDatePicker && (
                 <DateTimePicker
                     testID="datePicker"
                     value={dob}
                     mode="date"
                     display='calendar'
-                    onChange={(event,selectedDate)=>{setShowDatePicker(false);setDob(selectedDate);}}
+                    onChange={(event,selectedDate)=>{
+                        if(event.type=='set'){
+                            setShowDatePicker(false);
+                            setDob(selectedDate);
+                        }
+                        else{
+                            setShowDatePicker(false);
+                            return;
+                        }
+                    }}
+                    onTouchCancel={()=>setShowDatePicker(false)}
+                    
+                    
                 />
             )}
          </View>

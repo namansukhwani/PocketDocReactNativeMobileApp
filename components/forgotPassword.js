@@ -4,6 +4,7 @@ import {Button, Headline, Subheading,TextInput} from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import auth from '@react-native-firebase/auth';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import {Utility} from '../utility/utility';
 
 export default function ForgotPassword(props){
     
@@ -24,25 +25,30 @@ export default function ForgotPassword(props){
             return;
         }
 
-        auth().sendPasswordResetEmail(email)
+        const utility=new Utility();
+        utility.checkNetwork()
         .then(()=>{
-            ToastAndroid.show("Email Sent",ToastAndroid.LONG);
-            console.log("done");
-            setTimeout(()=>{
-                props.navigation.navigate('login');
-            },300)
+            auth().sendPasswordResetEmail(email)
+            .then(()=>{
+                ToastAndroid.show("Email Sent",ToastAndroid.LONG);
+                console.log("done");
+                setTimeout(()=>{
+                    props.navigation.navigate('login');
+                },300)
+            })
+            .catch(error=>{
+                if (error.code === 'auth/invalid-email') {
+                    console.log('That email address is invalid!');
+                    ToastAndroid.show("That email address is invalid!",ToastAndroid.LONG);
+                }
+                if (error.code === 'auth/user-not-found') {
+                    console.log('This email is not registered!');
+                    ToastAndroid.show("This email is not registered!",ToastAndroid.LONG);
+                }
+                console.log(error);
+            })
         })
-        .catch(error=>{
-            if (error.code === 'auth/invalid-email') {
-                console.log('That email address is invalid!');
-                ToastAndroid.show("That email address is invalid!",ToastAndroid.LONG);
-            }
-            if (error.code === 'auth/user-not-found') {
-                console.log('This email is not registered!');
-                ToastAndroid.show("This email is not registered!",ToastAndroid.LONG);
-            }
-            console.log(error);
-        })
+        .catch(err=>console.log(err))
     }
 
     return(

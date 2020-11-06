@@ -1,0 +1,183 @@
+import React,{useEffect, useState} from 'react';
+import {View,StyleSheet,StatusBar,Image,ToastAndroid, Alert,Linking} from 'react-native';
+import {Avatar, Button, Headline, Paragraph, RadioButton, Subheading,TextInput, Title,} from 'react-native-paper';
+import * as Animatable from 'react-native-animatable';
+import auth from '@react-native-firebase/auth';
+import Spinner from 'react-native-spinkit';
+import ImagePicker from 'react-native-image-crop-picker';
+import storage from '@react-native-firebase/storage';
+import {Utility} from '../utility/utility';
+import { Value } from 'react-native-reanimated';
+
+export default function SetProfilePic(props){
+    
+    const [profilePicUrl, setProfilePicUrl] = useState('');
+    const [uploading, setUploading] = useState(false);
+    
+    async function uploadImage(path,filename){
+        const utility=new Utility();
+        utility.checkNetwork()
+        .then(()=>{
+            setUploading(true);
+            const task =storage().ref().child('images/'+filename).putFile(path);
+
+            task.on('state_changed',snapshot=>{
+                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+            },(error)=>{
+                console.log(error);
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                      // User doesn't have permission to access the object
+                      break;
+      
+                    case 'storage/canceled':
+                      // User canceled the upload
+                      break;
+      
+                    case 'storage/unknown':
+                      // Unknown error occurred, inspect error.serverResponse
+                    break;
+                  }
+            },()=>{
+                task.snapshot.ref.getDownloadURL()
+                .then(url=>{
+                    setProfilePicUrl(url);
+                    setUploading(false);
+                })
+                .catch(err=>{
+                    console.log("url ::",err);
+                    setUploading(false);
+                })
+            })
+
+        })
+        .catch(err=>{console.log(err)});
+    }
+
+    function pickFromGallery(){
+        ImagePicker.openPicker({
+            width:400,
+            height:400,
+            compressImageQuality:0.8,
+            cropping:true,
+            enableRotationGesture:true,
+            mediaType:'photo'
+        })
+        .then(image=>{
+            let filename = image.path.substring(image.path.lastIndexOf('/') + 1, image.path.length);
+            uploadImage(image.path.slice(7),filename);
+            console.log("path:: ",image.path.slice(7));
+        })
+        .catch(err=>{
+            console.log(err);
+            if(err.message=='Required permission missing'){
+                Alert.alert(
+                    'Permission Denied',
+                    'Please allow permission to use storage.',
+                    [
+                        
+                        {text:'GO TO SETTINGS', style:'default', onPress:()=>{Linking.openSettings()}},
+                        {text: 'Ok', }
+                    ],
+                    {cancelable: false},
+                );
+                return;
+            }
+            else if(err.message=='User cancelled image selection'){
+                return;
+            }
+            else{
+                Alert.alert("Some error occurred while fetching the image.");
+            }
+            
+        })
+    }
+
+    function captureImage(){
+        ImagePicker.openCamera({
+            width:400,
+            height:400,
+            compressImageQuality:0.8,
+            cropping:true,
+            enableRotationGesture:true,
+            mediaType:'photo'
+        })
+        .then(image=>{
+            let filename = image.path.substring(image.path.lastIndexOf('/') + 1, image.path.length);
+            uploadImage(image.path,filename);
+            console.log("path:: ",image.path);
+        })
+        .catch(err=>{
+            console.log(err);
+            if(err.message=='Required permission missing'){
+                Alert.alert(
+                    'Permission Denied',
+                    'Please allow permission to use camera.',
+                    [
+                        
+                        {text:'GO TO SETTINGS', style:'default', onPress:()=>{Linking.openSettings()}},
+                        {text: 'Ok', }
+                    ],
+                    {cancelable: false},
+                );
+                return;
+            }
+            else if(err.message=='User cancelled image selection'){
+                return;
+            }
+            else{
+                Alert.alert("Some error occurred while fetching the image.");
+            }
+            
+        })
+    }
+
+    return(
+        <View style={{flex:1,backgroundColor:"#fff"}}>
+            <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+            <Animatable.View style={styles.container} animation="slideInUp" duration={700} useNativeDriver={true}>
+                {uploading ? 
+                    <View style={{alignSelf:'center',marginBottom:40}}>
+                        <Spinner 
+                            type="Wave"
+                            color="#147efb98"
+                            style={{alignSelf:"center"}}
+                            isVisible={uploading}
+                            size={50}
+                        />
+                        <Title style={{color:"#147efb",alignSelf:"center"}}>UPLOADING</Title>
+                    </View>
+                    :
+                    (profilePicUrl===""? 
+                        <Avatar.Image style={{elevation:10,alignSelf:'center',marginBottom:40}} size={130} source={require('../assets/user_avatar.png')} /> 
+                        :
+                        <Avatar.Image style={{elevation:10,alignSelf:'center',marginBottom:40}} size={130} source={{uri:profilePicUrl}} />
+                    )
+                    
+                }
+                
+                <Title style={{fontWeight:'bold',alignSelf:'center'}}>Setup Your Profile Picture</Title>
+                <Paragraph style={{alignSelf:'center',width:'85%',textAlign:'center'}}>To setup a profile picture choose an image from gallery or capture a new image. You can also skip and setup it later.</Paragraph>
+                <Button mode="outlined" style={{width:'90%',alignSelf:'center',marginTop:30}} color="#147EFB" onPress={()=>pickFromGallery()}>Select image from gallery</Button>
+                <Button mode="outlined" style={{width:'90%',alignSelf:'center',marginTop:30}} color="#147EFB" onPress={()=>captureImage()}>Click new image</Button>
+            </Animatable.View>
+            <Button mode="contained" style={styles.lowerButton} color="#147EFB" onPress={()=>props.navigation.navigate("home")} >{profilePicUrl===""? 'SKIP' :'NEXT'}</Button>
+        </View>
+    );
+}
+
+const styles=StyleSheet.create({
+    lowerButton:{
+        position:'absolute',
+        bottom:20,
+        right:20,
+        width:80
+    },
+    container:{
+        flex:1,
+        backgroundColor:'#fff',
+        justifyContent:'center',
+        paddingHorizontal:20
+    },
+})

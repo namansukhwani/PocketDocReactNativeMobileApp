@@ -5,10 +5,20 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import * as Animatable from 'react-native-animatable';
 import LoadingScreen from './loadingScreen';
 import auth from '@react-native-firebase/auth';
+import {Utility} from '../utility/utility';
+import {connect} from 'react-redux';
 
-const url="https://pdoc-api.herokuapp.com/";
+const mapStateToProps=state =>{
+    return{
 
-export default function Login(props){
+    };
+};
+
+const mapDispatchToProps=(dispatch) => ({
+
+})
+
+function Login(props){
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -22,7 +32,7 @@ export default function Login(props){
 
         const userChangeListner=auth().onAuthStateChanged((user)=>{
             console.log(user);
-            
+
                 if(user!==null){
                     auth().currentUser.reload();
                     if(user.photoURL==="user"){
@@ -30,10 +40,14 @@ export default function Login(props){
                             checkUserData(user.uid,true);
                         }
                         else{
+                            setLoading(false);
                             props.navigation.navigate("emailVerification");
                         }
                         
                     }
+                }
+                else{
+                    setCheckingLogin(false);
                 }
 
             //console.log(auth().currentUser.emailVerified)
@@ -43,7 +57,7 @@ export default function Login(props){
     },[]);
 
     const checkUserData=(uid,first)=>{
-        fetch(url+`/users/${uid}`,{
+        fetch(global.url+`/users/${uid}`,{
             method:"GET",
             headers:new Headers({
                 'Origin':'https://PocketDocOnly.com',
@@ -53,15 +67,32 @@ export default function Login(props){
         .then(res=>res.json())
         .then(response=>{
             if(!response.status){
-                if(first){setCheckingLogin(false);}
-                props.navigation.navigate("getNewUserData",{user:auth().currentUser.providerData});
+                if(first){
+                    setCheckingLogin(false);
+                }
+                else{
+                    setLoading(false);
+                    setEmail('');
+                    setPassword('');
+                }
+                
+                props.navigation.navigate("getNewUserData");
+                
             }
             else{
-                if(first){setCheckingLogin(false);}
-                props.navigation.navigate("home",{user:auth().currentUser.providerData});
+                if(first){
+                    setCheckingLogin(false);
+                }
+                else{
+                    setLoading(false);
+                    setEmail('');
+                    setPassword('');
+                }
+                props.navigation.navigate("home");
             }
         })
         .catch(err=>{
+            setCheckingLogin(false);
             console.log('Error APi: ',err);
         })
     }
@@ -95,74 +126,82 @@ export default function Login(props){
             return;
         } 
 
-        auth()
-        .signInWithEmailAndPassword(email,password)
-        .then((user) => {
-            console.log('User account created & signed in!');
-            console.log("User :",user.user.email);
-            if(user.user.photoURL!=="user"){
-                auth().signOut()
-                .then(()=>{
-                    if(user.user.photoURL==="doctor"){
-                        console.log("This is a doctor ID");
-                    }
-                    if(user.user.photoURL==="hospital"){
-                        console.log("This is a hospital ID");
-                    }
-                    setLoading(false);
-                    return;
-                })
-                .catch(err=>console.log("logout ERROR"))
-            }
-            else{
-                user.user.getIdToken()
-                .then(token=>{
-                    console.log("Token ::: ",token)
-                })
-                .catch(err=>{
-                    console.log("error in token :",err);
-                })
-                setEmail('');
-                setPassword('');
-                setLoading(false);
-                if(user.user.emailVerified){
-                    checkUserData(user.user.uid,false);
-                    //props.navigation.navigate("home",{user:user.user.providerData});
+        const utility=new Utility();
+        utility.checkNetwork()
+        .then(()=>{
+            auth()
+            .signInWithEmailAndPassword(email,password)
+            .then((user) => {
+                console.log('User account created & signed in!');
+                console.log("User :",user.user.email);
+                if(user.user.photoURL!=="user"){
+                    auth().signOut()
+                    .then(()=>{
+                        if(user.user.photoURL==="doctor"){
+                            console.log("This is a doctor ID");
+                        }
+                        if(user.user.photoURL==="hospital"){
+                            console.log("This is a hospital ID");
+                        }
+                        setLoading(false);
+                        return;
+                    })
+                    .catch(err=>console.log("logout ERROR"))
                 }
                 else{
-                    props.navigation.navigate("emailVerification");
+                    user.user.getIdToken()
+                    .then(token=>{
+                        console.log("Token ::: ",token)
+                    })
+                    .catch(err=>{
+                        console.log("error in token :",err);
+                    })
+                  
+                    
+                    if(user.user.emailVerified){
+                        checkUserData(user.user.uid,false);
+                        //props.navigation.navigate("home",{user:user.user.providerData});
+                    }
+                    else{
+                        setEmail('');
+                        setPassword('');
+                        setLoading(false);
+                        props.navigation.navigate("emailVerification");
+                    }
+                    //props.navigation.navigate("home",{user:user.user.providerData});
                 }
-                //props.navigation.navigate("home",{user:user.user.providerData});
-            }
-           
-        })
-        .catch(error => {
-            if (error.code === 'auth/email-already-in-use') {
-                console.log('That email address is already in use!');
-                ToastAndroid.show("That email address is already in use!",ToastAndroid.LONG);
-      
-            }
-
-            if (error.code === 'auth/invalid-email') {
-                console.log('That email address is invalid!');
-                ToastAndroid.show("That email address is invalid!",ToastAndroid.LONG);
+               
+            })
+            .catch(error => {
+                if (error.code === 'auth/email-already-in-use') {
+                    console.log('That email address is already in use!');
+                    ToastAndroid.show("That email address is already in use!",ToastAndroid.LONG);
           
-            }
-
-            if (error.code === 'auth/user-not-found') {
-                console.log('User with this email dosent exist');
-                ToastAndroid.show("User with this email dosent exist",ToastAndroid.LONG);
-            
-            }
-
-            if (error.code === 'auth/wrong-password') {
-                console.log('Password is incorrect');
-                ToastAndroid.show("Password is incorrect",ToastAndroid.LONG);
+                }
+    
+                if (error.code === 'auth/invalid-email') {
+                    console.log('That email address is invalid!');
+                    ToastAndroid.show("That email address is invalid!",ToastAndroid.LONG);
+              
+                }
+    
+                if (error.code === 'auth/user-not-found') {
+                    console.log('User with this email dosent exist');
+                    ToastAndroid.show("User with this email dosent exist",ToastAndroid.LONG);
                 
-            }
-            setLoading(false);
-            console.log(error);
-        });
+                }
+    
+                if (error.code === 'auth/wrong-password') {
+                    console.log('Password is incorrect');
+                    ToastAndroid.show("Password is incorrect",ToastAndroid.LONG);
+                    
+                }
+                setLoading(false);
+                console.log(error);
+            });
+        })
+        .catch(err=>{console.log(err);setCheckingLogin(false);setLoading(false);});
+       
     };
 
     if(checkingLogin){
@@ -197,6 +236,7 @@ export default function Login(props){
                             theme={{colors:{primary:"#147EFB"}}}
                             left={<TextInput.Icon name="account" color="#147EFB"/>}
                             error={error1}
+                            textContentType="emailAddress"
                         />
                         <TextInput
                             mode="outlined"
@@ -215,6 +255,7 @@ export default function Login(props){
                             right={<TextInput.Icon name={showPass ? "eye" : "eye-off"} color="#147EFB" onPress={()=>setShowPass(!showPass)} />}
                             secureTextEntry={!showPass}
                             error={error2}
+                            textContentType="password"
                         />
                         <Button mode="text" style={{width:190,alignSelf:'center'}} color="#147EFB" compact={true} onPress={()=>props.navigation.navigate("forgotPassword",{email:email})}>Forgot Password?</Button>
                         <Button mode="contained" loading={loading} icon="arrow-right-circle" style={{marginTop:35}} color="#147EFB" onPress={()=>handelLogin()}>LOGIN</Button>
@@ -304,3 +345,5 @@ const styles=StyleSheet.create({
         justifyContent:'center'
     }
 })
+
+export default connect(mapStateToProps,mapDispatchToProps)(Login);

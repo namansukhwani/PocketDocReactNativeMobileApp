@@ -4,6 +4,7 @@ import {Button, Headline, Subheading,TextInput} from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import auth from '@react-native-firebase/auth';
 import Spinner from 'react-native-spinkit';
+import {Utility} from '../utility/utility';
 
 export default function EmailVerification(props){
     
@@ -17,18 +18,24 @@ export default function EmailVerification(props){
         }
         else{
             setEmail(auth().currentUser.email);
-            auth().currentUser.sendEmailVerification()
+
+            const utility=new Utility();
+            utility.checkNetwork()
             .then(()=>{
-                console.log("Email Sent");
-                ToastAndroid.show("Email Verification Sent.",ToastAndroid.LONG);
-                auth().currentUser.re
+                auth().currentUser.sendEmailVerification()
+                .then(()=>{
+                    console.log("Email Sent");
+                    ToastAndroid.show("Email Verification Sent.",ToastAndroid.LONG);
+                    auth().currentUser.re
+                })
+                .catch(err=>{
+                    if(err.code==="auth/too-many-requests"){
+                        ToastAndroid.show("We have blocked all requests from this device due to unusual activity. Try again later.",ToastAndroid.LONG)
+                    }
+                    console.log("error in sent mail :",err);
+                });
             })
-            .catch(err=>{
-                if(err.code==="auth/too-many-requests"){
-                    ToastAndroid.show("We have blocked all requests from this device due to unusual activity. Try again later.",ToastAndroid.LONG)
-                }
-                console.log("error in sent mail :",err);
-            });
+            .catch(err=>console.log(err));
         }
         
         const interval=setInterval(()=>{
@@ -38,7 +45,7 @@ export default function EmailVerification(props){
                         if(auth().currentUser.emailVerified){
                             setVerified(true);
                             setTimeout(()=>{
-                                props.navigation.navigate("getNewUserData",{user:auth().currentUser.providerData});
+                                props.navigation.navigate("getNewUserData");
                             },2000);
                             clearInterval(interval);
                         }

@@ -5,7 +5,7 @@ import {useBackHandler} from '@react-native-community/hooks';
 
 export default function Home(props){
 
-    const userData=props.route.params.user;
+    const userData=auth().currentUser.providerData;
     const [backCount, setBackCount] = useState(0);
 
     useBackHandler(()=>{

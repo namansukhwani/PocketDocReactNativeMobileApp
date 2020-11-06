@@ -4,6 +4,7 @@ import {Button, Headline, Subheading,TextInput} from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as Animatable from 'react-native-animatable';
 import auth from '@react-native-firebase/auth';
+import {Utility} from '../utility/utility';
 
 export default function SignUp(props){
 
@@ -60,42 +61,49 @@ export default function SignUp(props){
             return;
         }
         
-        auth()
-        .createUserWithEmailAndPassword(email,password)
-        .then((user) => {
-            
-            user.user.updateProfile({
-                displayName:name,
-                photoURL:"user"
+        const utility=new Utility();
+        utility.checkNetwork()
+        .then(()=>{
+            auth()
+            .createUserWithEmailAndPassword(email,password)
+            .then((user) => {
+                
+                user.user.updateProfile({
+                    displayName:name,
+                    photoURL:"user"
+                })
+                .then(user=>{
+                    setLoading(false);
+                    global.userAuthData=auth().currentUser;
+                    props.navigation.navigate("emailVerification");
+                })
+                .catch(err=>{
+                    setLoading(false);
+                    console.log(err);
+                })
+                console.log('User account created & signed in!');
+                console.log("User :",user.user.email);
+                //props.navigation.navigate("home",{user:user.user.providerData});
             })
-            .then(user=>{
+            .catch(error => {
                 setLoading(false);
-                props.navigation.navigate("emailVerification");
-            })
-            .catch(err=>{
-                setLoading(false);
-                console.log(err);
-            })
-            console.log('User account created & signed in!');
-            console.log("User :",user.user.email);
-            //props.navigation.navigate("home",{user:user.user.providerData});
+                if (error.code === 'auth/email-already-in-use') {
+                console.log('That email address is already in use!');
+                ToastAndroid.show("That email address is already in use!",ToastAndroid.LONG);
+                }
+    
+                if (error.code === 'auth/invalid-email') {
+                console.log('That email address is invalid!');
+                ToastAndroid.show("That email address is invalid!",ToastAndroid.LONG);
+                }
+    
+                
+    
+                console.log("error",error);
+            });
         })
-        .catch(error => {
-            setLoading(false);
-            if (error.code === 'auth/email-already-in-use') {
-            console.log('That email address is already in use!');
-            ToastAndroid.show("That email address is already in use!",ToastAndroid.LONG);
-            }
-
-            if (error.code === 'auth/invalid-email') {
-            console.log('That email address is invalid!');
-            ToastAndroid.show("That email address is invalid!",ToastAndroid.LONG);
-            }
-
-            
-
-            console.log("error",error);
-        });
+        .catch(err=>console.log(err))
+        
     };
 
     return(
@@ -140,6 +148,7 @@ export default function SignUp(props){
                             theme={{colors:{primary:"#147EFB"}}}
                             left={<TextInput.Icon name="email" color="#147EFB"/>}
                             error={error1}
+                            textContentType="emailAddress"
                         />
                         <TextInput
                             mode="outlined"
@@ -158,6 +167,7 @@ export default function SignUp(props){
                             right={<TextInput.Icon name={showPass1 ? "eye" : "eye-off"} color="#147EFB" onPress={()=>setShowPass1(!showPass1)} />}
                             secureTextEntry={!showPass1}
                             error={error2}
+                            textContentType="password"
                         />
                         <TextInput
                             mode="outlined"
@@ -176,6 +186,7 @@ export default function SignUp(props){
                             right={<TextInput.Icon name={showPass2 ? "eye" : "eye-off"} color="#147EFB" onPress={()=>setShowPass2(!showPass2)} />}
                             secureTextEntry={!showPass2}
                             error={error4}
+                            textContentType="password"
                         />
                         <Button mode="contained" loading={loading} icon="account-plus" style={{marginTop:35}} color="#147EFB" onPress={()=>handelSignUp()}>Register</Button>
                     </KeyboardAwareScrollView>

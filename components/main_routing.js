@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import GetNewUserData from './getNewUserData';
 import EmailVerification from './emailVerification';
 import auth from '@react-native-firebase/auth';
+import SetProfilePic from './SetProfilePic';
 
 const Stack=createStackNavigator();
 
@@ -96,6 +97,18 @@ export default function Main(){
                         ),
                     })}
                     component={EmailVerification}
+                />
+                <Stack.Screen
+                    name="SetProfilePic"
+                    options={({route,navigation})=>({
+                        headerTitle:'Profile Picture',
+                        headerTitleAlign:'center',
+                        headerLeft:()=>(null),
+                        headerStyle:{
+                            elevation:0
+                        }
+                    })}
+                    component={SetProfilePic}
                 />
                 <Stack.Screen
                     name="forgotPassword"
