@@ -26,7 +26,6 @@ export default function EmailVerification(props){
                 .then(()=>{
                     console.log("Email Sent");
                     ToastAndroid.show("Email Verification Sent.",ToastAndroid.LONG);
-                    auth().currentUser.re
                 })
                 .catch(err=>{
                     if(err.code==="auth/too-many-requests"){
@@ -45,7 +44,7 @@ export default function EmailVerification(props){
                         if(auth().currentUser.emailVerified){
                             setVerified(true);
                             setTimeout(()=>{
-                                props.navigation.navigate("getNewUserData");
+                                props.navigation.navigate("getNewUserData",{userAuthData:auth().currentUser});
                             },2000);
                             clearInterval(interval);
                         }

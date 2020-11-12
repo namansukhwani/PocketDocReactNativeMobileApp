@@ -14,6 +14,7 @@ export default class App extends React.Component{
   constructor(props){
     super(props);
     global.url="https://pdoc-api.herokuapp.com/";
+    global.userAuthData={};
   }
 
   componentDidMount(){

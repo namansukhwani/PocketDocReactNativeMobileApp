@@ -1,20 +1,53 @@
-import React,{useEffect, useState} from 'react';
-import {View,StyleSheet,StatusBar,Image,ToastAndroid, Alert,Linking} from 'react-native';
+import React,{useCallback, useState} from 'react';
+import {View,StyleSheet,StatusBar,Image,ToastAndroid, Alert,Linking,BackHandler} from 'react-native';
 import {Avatar, Button, Headline, Paragraph, RadioButton, Subheading,TextInput, Title,} from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import auth from '@react-native-firebase/auth';
 import Spinner from 'react-native-spinkit';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
+import {connect} from 'react-redux';
 import {Utility} from '../utility/utility';
-import { Value } from 'react-native-reanimated';
+import {updateUserDetails} from '../redux/ActionCreators';
+import {useFocusEffect} from '@react-navigation/native';
 
-export default function SetProfilePic(props){
+//redux
+const mapStateToProps=state =>{
+    return{
+        user:state.user
+    };
+};
+
+const mapDispatchToProps=(dispatch) => ({
+    updateUserDetails:(uid,updateData)=>dispatch(updateUserDetails(uid,updateData)),
+})
+
+function SetProfilePic(props){
     
+    const [disable, setDisable] = useState(false);
     const [profilePicUrl, setProfilePicUrl] = useState('');
     const [uploading, setUploading] = useState(false);
-    
+    const [backCount, setBackCount] = useState(0);
+
+    //lifecycle
+
+    useFocusEffect(
+        useCallback(() => {
+            const backhandler=BackHandler.addEventListener("hardwareBackPress",()=>{
+                backCount===0 ? ToastAndroid.show('Press back to exit',ToastAndroid.SHORT) : BackHandler.exitApp();
+                setBackCount(1);
+                setTimeout(()=>{setBackCount(0)},3000)
+                return true;
+            })
+
+            return ()=>{
+                backhandler.remove();
+            }
+        },[])
+    );
+
     async function uploadImage(path,filename){
+        setDisable(true);
         const utility=new Utility();
         utility.checkNetwork()
         .then(()=>{
@@ -25,6 +58,7 @@ export default function SetProfilePic(props){
                 var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 console.log('Upload is ' + progress + '% done');
             },(error)=>{
+                setDisable(false)
                 console.log(error);
                 switch (error.code) {
                     case 'storage/unauthorized':
@@ -43,16 +77,35 @@ export default function SetProfilePic(props){
                 task.snapshot.ref.getDownloadURL()
                 .then(url=>{
                     setProfilePicUrl(url);
-                    setUploading(false);
+                    
+                    const updateData=JSON.stringify({
+                        profilePictureUrl:url
+                    }); 
+
+                    props.updateUserDetails(auth().currentUser.uid,updateData)
+                    .then(()=>{
+                        console.log("User data updated.");
+                        setUploading(false);
+                    })
+                    .catch(err=>{
+                        console.log(err);
+                        setUploading(false);
+                        Alert.alert("Unable to update user.")
+                        
+                    })
+                    
+                    setDisable(false);
                 })
                 .catch(err=>{
                     console.log("url ::",err);
                     setUploading(false);
+                    setDisable(false);
                 })
+                
             })
 
         })
-        .catch(err=>{console.log(err)});
+        .catch(err=>{console.log(err);setDisable(false)});
     }
 
     function pickFromGallery(){
@@ -162,7 +215,7 @@ export default function SetProfilePic(props){
                 <Button mode="outlined" style={{width:'90%',alignSelf:'center',marginTop:30}} color="#147EFB" onPress={()=>pickFromGallery()}>Select image from gallery</Button>
                 <Button mode="outlined" style={{width:'90%',alignSelf:'center',marginTop:30}} color="#147EFB" onPress={()=>captureImage()}>Click new image</Button>
             </Animatable.View>
-            <Button mode="contained" style={styles.lowerButton} color="#147EFB" onPress={()=>props.navigation.navigate("home")} >{profilePicUrl===""? 'SKIP' :'NEXT'}</Button>
+            <Button mode="contained" disabled={disable} style={styles.lowerButton} color="#147EFB" onPress={()=>props.navigation.navigate("home")} >{profilePicUrl===""? 'SKIP' :'NEXT'}</Button>
         </View>
     );
 }
@@ -181,3 +234,5 @@ const styles=StyleSheet.create({
         paddingHorizontal:20
     },
 })
+
+export default connect(mapStateToProps,mapDispatchToProps)(SetProfilePic);

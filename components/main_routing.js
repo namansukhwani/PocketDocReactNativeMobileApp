@@ -1,24 +1,82 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import {Alert, TouchableOpacity,ToastAndroid} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {} from '@react-navigation/bottom-tabs';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Login from './login';
 import Home from './home';
 import SignUp from './signUp';
 import ForgotPassword from './forgotPassword';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AntIcon from 'react-native-vector-icons/AntDesign';
+import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import GetNewUserData from './getNewUserData';
 import EmailVerification from './emailVerification';
 import auth from '@react-native-firebase/auth';
 import SetProfilePic from './SetProfilePic';
+import AllChats from './AllChats';
+import Chat from './Chat';
+import Appointments from './Appointments';
+import Settings from './Settings';
 
 const Stack=createStackNavigator();
+const Tab=createBottomTabNavigator();
+
+function BottomDrawer(props){
+
+    return(
+        <Tab.Navigator 
+            tabBarOptions={{
+                activeTintColor:'#147efb',
+                keyboardHidesTabBar:true,
+                
+            }} 
+            screenOptions={{
+                unmountOnBlur:true
+            }}
+            initialRouteName="userHome"
+        >
+            <Tab.Screen
+                name="userHome"
+                component={Home}
+                options={{
+                    tabBarLabel:'Home',
+                    tabBarIcon:({color,size})=><AntIcon name="home" color={color} size={size} />
+                }}
+            />
+            <Tab.Screen
+                name="Appointments"
+                component={Appointments}
+                options={({route,navigation})=>({
+                    tabBarLabel:'Appointments',
+                    tabBarIcon:({color,size})=><ComunityIcon name="calendar-plus" color={color} size={size} />,
+                })}
+            />
+            <Tab.Screen
+                name="AllChats"
+                component={AllChats}
+                options={({route,navigation})=>({
+                    tabBarLabel:'Chats',
+                    tabBarIcon:({color,size})=><MaterialIcon name="chat" color={color} size={size} />,
+                })}
+            />
+            <Tab.Screen
+                name="Settings"
+                component={Settings}
+                options={({route,navigation})=>({
+                    tabBarLabel:'Settings',
+                    tabBarIcon:({color,size})=><MaterialIcon name="settings" color={color} size={size} />,
+                })}
+            />
+        </Tab.Navigator>
+    )
+}
 
 export default function Main(){
     return(
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="login">
+            <Stack.Navigator initialRouteName="login" screenOptions={{detachPreviousScreen:true}}>
                 <Stack.Screen
                     name="login"
                     options={{
@@ -127,13 +185,19 @@ export default function Main(){
                 <Stack.Screen
                     name="home"
                     options={({route,navigation})=>({
-                        title:"Home",
-                        headerTitleAlign:'center',
-                        headerLeft:null
+                        headerShown:false
                     })}
-                    component={Home}
+                    component={BottomDrawer}
                 />
-                
+
+
+                <Stack.Screen
+                    name="Chat"
+                    options={({route,navigation})=>({
+                        headerShown:false
+                    })}
+                    component={Chat}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     )

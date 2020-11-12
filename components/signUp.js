@@ -42,12 +42,6 @@ export default function SignUp(props){
             setLoading(false);
             return;
         }
-        if(password===''){
-            setError2(true);
-            ToastAndroid.show("Password field can\'t be empty.",ToastAndroid.LONG);
-            setLoading(false);
-            return;
-        }
         if(password.length < 4 || password.length > 14){
             setError2(true);
             ToastAndroid.show("Password must be minimum 4 and maximum 14 characters.",ToastAndroid.LONG);

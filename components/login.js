@@ -7,17 +7,20 @@ import LoadingScreen from './loadingScreen';
 import auth from '@react-native-firebase/auth';
 import {Utility} from '../utility/utility';
 import {connect} from 'react-redux';
+import {getUserDetails} from '../redux/ActionCreators';
 
+//redux
 const mapStateToProps=state =>{
     return{
-
+        user:state.user
     };
 };
 
 const mapDispatchToProps=(dispatch) => ({
-
+    getUserDetails:(uid)=>dispatch(getUserDetails(uid)),
 })
 
+//component
 function Login(props){
 
     const [email, setEmail] = useState('');
@@ -34,17 +37,33 @@ function Login(props){
             console.log(user);
 
                 if(user!==null){
-                    auth().currentUser.reload();
-                    if(user.photoURL==="user"){
-                        if(user.emailVerified){
-                            checkUserData(user.uid,true);
+                   
+                    const utility=new Utility();
+                    utility.checkNetwork()
+                    .then(()=>{
+                        auth().currentUser.reload()
+                        .then((user)=>{
+                            global.userAuthData=auth().currentUser;   
+                        })
+                        .catch(err=>console.log(err))
+                        if(user.photoURL==="user"){
+                            if(user.emailVerified){
+                                checkUserData(user.uid,true);
+                            }
+                            else{
+                                setLoading(false);
+                                props.navigation.navigate("emailVerification");
+                            }
+                            
                         }
-                        else{
-                            setLoading(false);
-                            props.navigation.navigate("emailVerification");
+                    })
+                    .catch((err)=>{
+                        console.log(err);
+                        if(props.user.available){
+                            setCheckingLogin(false);
+                            props.navigation.navigate("home");
                         }
-                        
-                    }
+                    })
                 }
                 else{
                     setCheckingLogin(false);
@@ -56,17 +75,24 @@ function Login(props){
         return userChangeListner;
     },[]);
 
+    //methods
     const checkUserData=(uid,first)=>{
-        fetch(global.url+`/users/${uid}`,{
-            method:"GET",
-            headers:new Headers({
-                'Origin':'https://PocketDocOnly.com',
-                'Content-Type':'application/json'
-            }),
+        props.getUserDetails(uid)
+        .then(()=>{
+           
+                if(first){
+                    setCheckingLogin(false);
+                }
+                else{
+                    setLoading(false);
+                    setEmail('');
+                    setPassword('');
+                }
+                props.navigation.navigate("home");
+            
         })
-        .then(res=>res.json())
-        .then(response=>{
-            if(!response.status){
+        .catch((err)=>{
+            if(err.status){
                 if(first){
                     setCheckingLogin(false);
                 }
@@ -79,19 +105,6 @@ function Login(props){
                 props.navigation.navigate("getNewUserData");
                 
             }
-            else{
-                if(first){
-                    setCheckingLogin(false);
-                }
-                else{
-                    setLoading(false);
-                    setEmail('');
-                    setPassword('');
-                }
-                props.navigation.navigate("home");
-            }
-        })
-        .catch(err=>{
             setCheckingLogin(false);
             console.log('Error APi: ',err);
         })
@@ -113,12 +126,6 @@ function Login(props){
             setLoading(false);
             return;
         }
-        if(password===''){
-            setError2(true);
-            ToastAndroid.show("Password field can\'t be empty.",ToastAndroid.LONG);
-            setLoading(false);
-            return;
-        }
         if(password.length < 4 || password.length > 14){
             setError2(true);
             ToastAndroid.show("Password must be minimum 4 and maximum 14 characters.",ToastAndroid.LONG);
@@ -132,7 +139,8 @@ function Login(props){
             auth()
             .signInWithEmailAndPassword(email,password)
             .then((user) => {
-                console.log('User account created & signed in!');
+                global.userAuthData=user.user;
+                console.log('User account signed in!');
                 console.log("User :",user.user.email);
                 if(user.user.photoURL!=="user"){
                     auth().signOut()

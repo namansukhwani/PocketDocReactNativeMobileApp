@@ -1,5 +1,5 @@
-import React,{useEffect, useState} from 'react';
-import {View,StyleSheet,StatusBar,Image,ToastAndroid} from 'react-native';
+import React,{useEffect, useState,useCallback} from 'react';
+import {View,StyleSheet,StatusBar,Image,ToastAndroid,Keyboard,BackHandler, Alert} from 'react-native';
 import {Button, Headline, Paragraph, RadioButton, Subheading,TextInput, Title} from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import auth from '@react-native-firebase/auth';
@@ -7,14 +7,29 @@ import Spinner from 'react-native-spinkit';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import {Utility} from '../utility/utility';
+import {useFocusEffect} from '@react-navigation/native';
+import {connect} from 'react-redux';
+import {addUserDetails} from '../redux/ActionCreators';
 
-export default function GetNewUserData(props){
+//redux 
+const mapStateToProps=state =>{
+    return{
+        user:state.user
+    };
+};
+
+const mapDispatchToProps=(dispatch) => ({
+    addUserDetails:(uid,userData)=>dispatch(addUserDetails(uid,userData)),
+})
+
+//component
+function GetNewUserData(props){
     
-    const userData=auth().currentUser.providerData[0];
+    const userAuthData=auth().currentUser;
 
-    const [name, setName] = useState(userData.displayName);
-    const [email, setEmail] = useState(userData.email);
-    const [password, setPassword] = useState('123456213');
+    const [name, setName] = useState(userAuthData.providerData[0].displayName);
+    const [email, setEmail] = useState(userAuthData.providerData[0].email);
     const [phoneNo, setPhoneNo] = useState('');
     const [gender, setGender] = useState('');
     const [dob, setDob] = useState(new Date());
@@ -30,12 +45,112 @@ export default function GetNewUserData(props){
     const [error3, setError3] = useState(false);
     const [error4, setError4] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [backCount, setBackCount] = useState(0);
+
+    //lifecycle
+
+    useFocusEffect(
+        useCallback(() => {
+            const backhandler=BackHandler.addEventListener("hardwareBackPress",()=>{
+                backCount===0 ? ToastAndroid.show('Press back to exit',ToastAndroid.SHORT) : BackHandler.exitApp();
+                setBackCount(1);
+                setTimeout(()=>{setBackCount(0)},3000)
+                return true;
+            })
+
+            return ()=>{
+                backhandler.remove();
+            }
+        },[])
+    );
+
+    //regex
+    const onlyNo=/^[0-9]*$/;
+
+    function getAge() {
+        var today=new Date();
+        var age = today.getFullYear() - dob.getFullYear();
+        var m = today.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+            age--;
+        }
+        return age;
+    }
+
+    function completeRegistration(){
+        
+        if(phoneNo.length<10||phoneNo.length>10){
+            setError1(true);
+            ToastAndroid.show("Mobile no can't be less or more than 10 digits",ToastAndroid.LONG);
+        }
+        else if(!onlyNo.test(phoneNo)){
+            setError1(true)
+            ToastAndroid.show("Mobile no can't have alphabets.",ToastAndroid.LONG);
+        }
+        else if(gender===''){
+            ToastAndroid.show("Please Fill in your gender to Continue",ToastAndroid.LONG);
+        }
+        else if(getAge()<=13){
+            ToastAndroid.show("Minimum age to register is 14 years.",ToastAndroid.LONG);
+        }
+        else if(address.length <10 ){
+            setError2(true)
+            ToastAndroid.show("Address can\'t be less than 10 letters.",ToastAndroid.LONG);
+        }
+        else if(pincode.length <6 || pincode.length>6 || !onlyNo.test(pincode)){
+            setError3(true)
+            ToastAndroid.show("Enter a correct Pincode",ToastAndroid.LONG);
+        }
+        else{
+            setLoading(true);
+            const utility=new Utility();
+            utility.checkNetwork()
+            .then(()=>{
+            
+            const userData=JSON.stringify({
+                userId:userAuthData.uid,
+                email: email,
+                phoneNo: phoneNo,
+                name: name,
+                gender: gender,
+                dob:dob.toISOString() ,
+                profilePictureUrl: "",
+                address: address,
+                landmark: landmark,
+                state: state,
+                city: city,
+                country: country,
+                pincode: pincode,
+                verificationType: "",
+                verificatonDocUrl: "",
+                medicalHistory: []
+            })
+
+            props.addUserDetails(userAuthData.uid,userData)
+            .then(()=>{
+                setLoading(false);
+                ToastAndroid.show("Registration Sucessfull",ToastAndroid.LONG);
+                props.navigation.navigate("SetProfilePic");
+            })
+            .catch((err)=>{
+                Alert.alert("Unable to register right now please try again later.")
+                setLoading(false);
+            });
+        })
+        .catch((err)=>{
+            console.log(err);
+            setLoading(false);
+        })
+        }
+        Keyboard.dismiss();
+        
+    }
 
     return(
         <View style={{flex:1,backgroundColor:"#fff"}}>
             <StatusBar backgroundColor="#fff" barStyle="dark-content" />
             <Animatable.View style={styles.container} animation="slideInUp" duration={700} useNativeDriver={true}> 
-                <KeyboardAwareScrollView enableOnAndroid={true} extraHeight={100} showsVerticalScrollIndicator={false}>
+                <KeyboardAwareScrollView enableOnAndroid={true} extraHeight={100} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
                     <Paragraph style={{marginTop:20}}>Please fill the below information to complete your account registration.</Paragraph>
                     <Title style={{fontWeight:'bold'}}>Account Info</Title>
                     <TextInput
@@ -60,19 +175,6 @@ export default function GetNewUserData(props){
                         left={<TextInput.Icon name="email" color="#147EFB"/>}
                         editable={false}
                     />
-                    <TextInput
-                        mode="outlined"
-                        label="Password*"
-                        value={password}
-                        onChangeText={(text)=>{setPassword(text);}}
-                        placeholder="Password"
-                        style={{backgroundColor:"#fff",marginTop:10}}
-                        theme={{colors:{primary:"#147EFB"}}}
-                        left={<TextInput.Icon name="lock" color="#147EFB"/>}
-                        //right={<TextInput.Icon name={showPass1 ? "eye" : "eye-off"} color="#147EFB" onPress={()=>setShowPass1(!showPass1)} />}
-                        secureTextEntry={true}
-                        editable={false}
-                    />
                     
                     <Title style={{fontWeight:'bold',marginTop:10}}>Personal Info</Title>
                     
@@ -86,6 +188,17 @@ export default function GetNewUserData(props){
                             }
                             setPhoneNo(text);
                         }}
+                        onBlur={()=>{
+                            if(phoneNo.length<10||phoneNo.length>10){
+                                setError1(true);
+                                ToastAndroid.show("Mobile no can't be less or more than 10 digits",ToastAndroid.LONG);
+                            }
+                            if(!onlyNo.test(phoneNo)){
+                                setError1(true)
+                                ToastAndroid.show("Mobile no can't have alphabets.",ToastAndroid.LONG);
+                            }
+                        }}
+                        error={error1}
                         placeholder="Mobile Number here"
                         style={{backgroundColor:"#fff",marginTop:10}}
                         theme={{colors:{primary:"#147EFB"}}}
@@ -129,11 +242,18 @@ export default function GetNewUserData(props){
                         label="Address*"
                         value={address}
                         onChangeText={(text)=>{
-                            if(error1){
-                                setError1(false);
+                            if(error2){
+                                setError2(false);
                             }
-                            setPhoneNo(text);
+                            setAddress(text);
                         }}
+                        onBlur={()=>{
+                            if(address.length <10 ){
+                                setError2(true)
+                                ToastAndroid.show("Address can\'t be less than 10 letters.",ToastAndroid.LONG);
+                            }
+                        }}
+                        error={error2}
                         placeholder="House No./Street Name"
                         style={{backgroundColor:"#fff",marginTop:10}}
                         theme={{colors:{primary:"#147EFB"}}}
@@ -143,10 +263,7 @@ export default function GetNewUserData(props){
                         label="Landmark"
                         value={landmark}
                         onChangeText={(text)=>{
-                            if(error1){
-                                setError1(false);
-                            }
-                            setPhoneNo(text);
+                            setLandmark(text);
                         }}
                         placeholder="Landmark near by(optional)"
                         style={{backgroundColor:"#fff",marginTop:10}}
@@ -158,10 +275,7 @@ export default function GetNewUserData(props){
                         label="City"
                         value={city}
                         onChangeText={(text)=>{
-                            if(error1){
-                                setError1(false);
-                            }
-                            setPhoneNo(text);
+                            setCity(text);
                         }}
                         placeholder="Your city"
                         style={{flex:1,backgroundColor:"#fff",marginTop:10,marginRight:5}}
@@ -172,10 +286,7 @@ export default function GetNewUserData(props){
                         label="State"
                         value={state}
                         onChangeText={(text)=>{
-                            if(error1){
-                                setError1(false);
-                            }
-                            setPhoneNo(text);
+                            setState(text);
                         }}
                         placeholder="Your State"
                         style={{flex:1,backgroundColor:"#fff",marginTop:10,marginLeft:5}}
@@ -187,10 +298,7 @@ export default function GetNewUserData(props){
                         label="Country"
                         value={country}
                         onChangeText={(text)=>{
-                            if(error1){
-                                setError1(false);
-                            }
-                            setPhoneNo(text);
+                            setCountry(text);
                         }}
                         placeholder="Your Country"
                         style={{flex:1,backgroundColor:"#fff",marginTop:10,}}
@@ -201,21 +309,28 @@ export default function GetNewUserData(props){
                         label="Area Pincode*"
                         value={pincode}
                         onChangeText={(text)=>{
-                            if(error1){
-                                setError1(false);
+                            if(error3){
+                                setError3(false);
                             }
-                            setPhoneNo(text);
+                            setPincode(text);
+                        }}
+                        error={error3}
+                        onBlur={()=>{
+                            if(pincode.length <6 || pincode.length>6 || !onlyNo.test(pincode)){
+                                setError3(true)
+                                ToastAndroid.show("Enter a correct Pincode",ToastAndroid.LONG);
+                            }
                         }}
                         placeholder="Your Area Pincode"
                         style={{flex:1,backgroundColor:"#fff",marginTop:10,}}
                         theme={{colors:{primary:"#147EFB"}}}
                     />
 
-                    <Subheading style={{marginTop:10,fontWeight:'bold'}}>User verification</Subheading>
-                    <View style={{marginBottom:65}} />
+                    {/* <Subheading style={{marginTop:10,fontWeight:'bold'}}>User verification</Subheading> */}
+                    <View style={{marginBottom:70}} />
                 </KeyboardAwareScrollView>
             </Animatable.View>
-            <Button mode="contained" loading={loading} style={styles.button} color="#147EFB" onPress={()=>{props.navigation.navigate("SetProfilePic")}}>Complete Registration</Button>
+            <Button mode="contained" loading={loading} style={styles.button} color="#147EFB" onPress={()=>{completeRegistration()}}>Complete Registration</Button>
             {showDatePicker && (
                 <DateTimePicker
                     testID="datePicker"
@@ -268,3 +383,5 @@ const styles=StyleSheet.create({
         justifyContent:'center'
     },
 })
+
+export default connect(mapStateToProps,mapDispatchToProps)(GetNewUserData);
