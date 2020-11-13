@@ -3,7 +3,7 @@ import {View} from 'react-native';
 import {Appbar, Avatar,Title} from 'react-native-paper';
 
 export const ChatHeader=({backAction,videoCall,title,profilePicUrl})=>{
-    const lable=title.split(' ')[0][0]+title.split(' ')[1][0]
+    const lable=title.split(' ')[1][0]+title.split(' ')[2][0]
     return(
         <Appbar.Header theme={{colors:{primary:'#fff'}}}>
             <Appbar.BackAction onPress={()=>backAction()} />

@@ -9,58 +9,59 @@ import {} from '../redux/ActionCreators';
 import { FlatList } from 'react-native-gesture-handler';
 import moment from 'moment';
 import * as Animatable from 'react-native-animatable';
+import firestore from '@react-native-firebase/firestore';
 
-const data=[
-    {
-        name:"Nitesh Sukhwani",
-        lastMess:"Cool!",
-        time:new Date('11/07/2020'),
-        profilePic:""
-    },
-    {
-        name:"Joy Singh",
-        lastMess:"Sure Done:)",
-        time:new Date('11/02/2020'),
-        profilePic:"https://dyl80ryjxr1ke.cloudfront.net/external_assets/hero_examples/hair_beach_v1785392215/original.jpeg"
-    },
-    {
-        name:"Suresh Sukhwani",
-        lastMess:"Everythig is fine whatsup with you",
-        time:new Date(),
-        profilePic:""
-    },
-    {
-        name:"Manas Satpute",
-        lastMess:"Ok bro GREAT!!!",
-        time:new Date('11/10/2020'),
-        profilePic:""
-    },
-    {
-        name:"Nitesh Sukhwani",
-        lastMess:"Cool!",
-        time:new Date('11/07/2018'),
-        profilePic:""
-    },
-    {
-        name:"Joy Singh",
-        lastMess:"Sure Done:)",
-        time:new Date('11/02/2020'),
-        profilePic:"https://dyl80ryjxr1ke.cloudfront.net/external_assets/hero_examples/hair_beach_v1785392215/original.jpeg"
-    },
-    {
-        name:"Suresh Sukhwani",
-        lastMess:"Everythig is fine whatsup with you",
-        time:new Date(),
-        profilePic:""
-    },
-    {
-        name:"Manas Satpute",
-        lastMess:"Ok bro GREAT!!!",
-        time:new Date('11/10/2019'),
-        profilePic:""
-    },
+// const data=[
+//     {
+//         name:"Nitesh Sukhwani",
+//         lastMess:"Cool!",
+//         time:new Date('11/07/2020'),
+//         profilePic:""
+//     },
+//     {
+//         name:"Joy Singh",
+//         lastMess:"Sure Done:)",
+//         time:new Date('11/02/2020'),
+//         profilePic:"https://dyl80ryjxr1ke.cloudfront.net/external_assets/hero_examples/hair_beach_v1785392215/original.jpeg"
+//     },
+//     {
+//         name:"Suresh Sukhwani",
+//         lastMess:"Everythig is fine whatsup with you",
+//         time:new Date(),
+//         profilePic:""
+//     },
+//     {
+//         name:"Manas Satpute",
+//         lastMess:"Ok bro GREAT!!!",
+//         time:new Date('11/10/2020'),
+//         profilePic:""
+//     },
+//     {
+//         name:"Nitesh Sukhwani",
+//         lastMess:"Cool!",
+//         time:new Date('11/07/2018'),
+//         profilePic:""
+//     },
+//     {
+//         name:"Joy Singh",
+//         lastMess:"Sure Done:)",
+//         time:new Date('11/02/2020'),
+//         profilePic:"https://dyl80ryjxr1ke.cloudfront.net/external_assets/hero_examples/hair_beach_v1785392215/original.jpeg"
+//     },
+//     {
+//         name:"Suresh Sukhwani",
+//         lastMess:"Everythig is fine whatsup with you",
+//         time:new Date(),
+//         profilePic:""
+//     },
+//     {
+//         name:"Manas Satpute",
+//         lastMess:"Ok bro GREAT!!!",
+//         time:new Date('11/10/2019'),
+//         profilePic:""
+//     },
   
-]
+// ]
 
 const todayDate=new Date();
 
@@ -79,36 +80,58 @@ function AllChats(props){
 
     const [search, setSearch] = useState('');
     const [unread, setUnread] = useState(0);
+    const [data, setData] = useState([]);
+
+    //lifecycle
+    useEffect(()=>{
+        const unsubscribe=firestore().collection("chatRooms")
+        .where('userId','==',auth().currentUser.uid)
+        .orderBy('lastUpdatedDate','asc')
+        .onSnapshot(querySnapshot=>{
+            //setDatan([...querySnapshot.docs.]);
+            //console.log(querySnapshot.docs[0]._ref._documentPath);
+            const threads=querySnapshot.docs.map(documentSnapshot=>{
+                //console.log("Chat Rooms",documentSnapshot.data());
+                //setDatan(datan.concat(documentSnapshot.data()))
+                return(documentSnapshot.data());
+            })
+            setData(threads);
+        }) 
+
+        return ()=>unsubscribe();
+    },[]);
 
     function ListView({item,index}){
 
-        const lable=item.name.split(' ')[0][0]+item.name.split(' ')[1][0]
+        console.log(item);
+        const lable=item.doctorName.split(' ')[1][0]+item.doctorName.split(' ')[2][0]
         var time;
+        var updateDate=new Date(item.lastUpdatedDate.toDate());
         const yesterday=new Date(Date.now()-86400000);
-        if(todayDate.getDate()===item.time.getDate()){
-            var time=moment(item.time).format("h:m a");
+        if(todayDate.getDate()===updateDate.getDate()){
+            var time=moment(updateDate).format("hh:mm a");
         }
-        else if(yesterday.getDate()===item.time.getDate()){
+        else if(yesterday.getDate()===updateDate.getDate()){
             var time="Yesterday";
         }
-        else if(todayDate.getFullYear()===item.time.getFullYear()){
-            var time=moment(item.time).format("Do MMM");
+        else if(todayDate.getFullYear()===updateDate.getFullYear()){
+            var time=moment(updateDate).format("Do MMM");
         }
         else{
-            var time=moment(item.time).format("DD/MM/YYYY ");
+            var time=moment(updateDate).format("DD/MM/YYYY ");
         }
     
         return(
             <Animatable.View animation="slideInUp" duration={500} useNativeDriver={true}>
-            <TouchableOpacity style={styles.listItem} onPress={()=>props.navigation.navigate('Chat',{name:item.name,profilePicUrl:item.profilePic})}>
-                {item.profilePic===''?
+            <TouchableOpacity style={styles.listItem} onPress={()=>props.navigation.navigate('Chat',{data:item})}>
+                {item.doctorProfilePicUrl===''?
                     <Avatar.Text style={{alignSelf:'center'}} theme={{colors:{primary:('rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')')}}} size={49} label={lable} />
                     :
-                    <Avatar.Image source={{uri:item.profilePic}} style={{alignSelf:'center'}} theme={{colors:{primary:'#147efb'}}} size={49} />
+                    <Avatar.Image source={{uri:item.doctorProfilePicUrl}} style={{alignSelf:'center'}} theme={{colors:{primary:'#147efb'}}} size={49} />
                 }
                 <View style={{marginLeft:10,flex:1}}>
-                    <Title>{item.name}</Title>
-                    <Paragraph numberOfLines={1} style={{overflow:'hidden'}}>{item.lastMess}</Paragraph>
+                    <Title>{item.doctorName}</Title>
+                    <Paragraph numberOfLines={1} style={{overflow:'hidden'}}>{item.lastMessage===''? "No messages yet.":item.lastMessage}</Paragraph>
                     <Text style={styles.time}>{time}</Text>
                 </View>
                 <Badge 

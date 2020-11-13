@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import {View,StyleSheet,StatusBar,Image,ToastAndroid} from 'react-native';
+import {View,StyleSheet,StatusBar,Image,ToastAndroid,Keyboard} from 'react-native';
 import {Button, Headline,Subheading,TextInput} from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as Animatable from 'react-native-animatable';
@@ -112,6 +112,7 @@ function Login(props){
 
     const handelLogin=()=>{
         setLoading(true);
+        Keyboard.dismiss();
         const regexEmail=/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/;
 
         if(email===''){
