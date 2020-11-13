@@ -9,6 +9,7 @@ import {ChatHeader} from '../utility/ViewUtility';
 import {GiftedChat,Send} from 'react-native-gifted-chat';
 import {} from '../redux/ActionCreators';
 import firestore from '@react-native-firebase/firestore';
+import {useFocusEffect} from '@react-navigation/native';
 
 //redux
 const mapStateToProps=state =>{
@@ -29,6 +30,20 @@ function Chat(props){
     const [messages, setMessages] = useState([]);
     
     //lifecycles
+
+    useFocusEffect(
+        useCallback(() => {
+            const backhandler=BackHandler.addEventListener("hardwareBackPress",()=>{
+                backAction();
+                return true;
+            })
+
+            return ()=>{
+                backhandler.remove();
+            }
+        },[])
+    );
+
     useEffect(() => {
         
         //getMessagesData();
@@ -107,45 +122,48 @@ function Chat(props){
             .doc(props.route.params.data.roomId)
             .update({
                 lastMessage:messageDic.text,
-                lastUpdatedDate:firestore.Timestamp.fromDate(messageDic.createdAt)
+                lastUpdatedDate:firestore.Timestamp.fromDate(messageDic.createdAt),
+                userMessageCount:firestore.FieldValue.increment(1)
             })
+            .then((data)=>{console.log("done room update");})
+            .catch(err=>{console.log(err);})
         })
         .catch(err=>console.log("message sent err"));
     },[])
 
-    function getMessagesData(){
-        firestore()
-        .collection("chatRooms")
-        .doc(props.route.params.data.roomId)
-        .collection("messages")
-        .orderBy('createdDate','desc')
-        .get()
-        .then(querySnapshot=>{
-            const threads=querySnapshot.docs.map(documentSnapshot=>{
-                return{
-                    _id:documentSnapshot.id,
-                    text:documentSnapshot.data().body,
-                    createdAt:documentSnapshot.data().createdDate.toDate(),
-                    user:documentSnapshot.data().senderId===props.user.user.userId ? 
-                        {
-                            _id:documentSnapshot.data().senderId,
-                            name:props.user.user.name,
-                            avatar:props.user.user.profilePictureUrl
-                        }
-                        :
-                        {
-                            _id:documentSnapshot.data().senderId,
-                            name:props.route.params.data.doctorName,
-                            avatar:props.route.params.data.doctorProfilePicUrl
-                        }
+    // function getMessagesData(){
+    //     firestore()
+    //     .collection("chatRooms")
+    //     .doc(props.route.params.data.roomId)
+    //     .collection("messages")
+    //     .orderBy('createdDate','desc')
+    //     .get()
+    //     .then(querySnapshot=>{
+    //         const threads=querySnapshot.docs.map(documentSnapshot=>{
+    //             return{
+    //                 _id:documentSnapshot.id,
+    //                 text:documentSnapshot.data().body,
+    //                 createdAt:documentSnapshot.data().createdDate.toDate(),
+    //                 user:documentSnapshot.data().senderId===props.user.user.userId ? 
+    //                     {
+    //                         _id:documentSnapshot.data().senderId,
+    //                         name:props.user.user.name,
+    //                         avatar:props.user.user.profilePictureUrl
+    //                     }
+    //                     :
+    //                     {
+    //                         _id:documentSnapshot.data().senderId,
+    //                         name:props.route.params.data.doctorName,
+    //                         avatar:props.route.params.data.doctorProfilePicUrl
+    //                     }
                     
                     
-                }
-            })
-            setMessages(threads);
-            console.log(threads);
-        })
-    }
+    //             }
+    //         })
+    //         setMessages(threads);
+    //         console.log(threads);
+    //     })
+    // }
 
     function SendButton(props){
         return(
@@ -161,10 +179,24 @@ function Chat(props){
         )
     }
 
+    function backAction(){
+        firestore()
+        .collection("chatRooms")
+        .doc(props.route.params.data.roomId)
+        .update({
+            doctorMessageCount:0
+        })
+        .then((data)=>{
+            console.log("done room update");
+            props.navigation.goBack()
+        })
+        .catch(err=>{console.log(err);})
+}
+
     return(
         <View style={{flex:1,backgroundColor:'#fff'}}>
             <StatusBar backgroundColor="#fff" barStyle='dark-content' />
-            <ChatHeader backAction={()=>{props.navigation.goBack()}} videoCall={()=>{}} title={props.route.params.data.doctorName} profilePicUrl={props.route.params.data.doctorProfilePicUrl} />
+            <ChatHeader backAction={()=>{backAction()}} videoCall={()=>{}} title={props.route.params.data.doctorName} profilePicUrl={props.route.params.data.doctorProfilePicUrl} />
             <View style={{flex:1}}>
                 <GiftedChat
                     messages={messages}

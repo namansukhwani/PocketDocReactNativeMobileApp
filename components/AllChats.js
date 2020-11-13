@@ -79,14 +79,14 @@ const mapDispatchToProps=(dispatch) => ({
 function AllChats(props){
 
     const [search, setSearch] = useState('');
-    const [unread, setUnread] = useState(0);
+    // const [unread, setUnread] = useState(0);
     const [data, setData] = useState([]);
 
     //lifecycle
     useEffect(()=>{
         const unsubscribe=firestore().collection("chatRooms")
         .where('userId','==',auth().currentUser.uid)
-        .orderBy('lastUpdatedDate','asc')
+        .orderBy('lastUpdatedDate','desc')
         .onSnapshot(querySnapshot=>{
             //setDatan([...querySnapshot.docs.]);
             //console.log(querySnapshot.docs[0]._ref._documentPath);
@@ -103,7 +103,8 @@ function AllChats(props){
 
     function ListView({item,index}){
 
-        console.log(item);
+        //console.log(item);
+        const unread=item.doctorMessageCount;
         const lable=item.doctorName.split(' ')[1][0]+item.doctorName.split(' ')[2][0]
         var time;
         var updateDate=new Date(item.lastUpdatedDate.toDate());
@@ -118,14 +119,29 @@ function AllChats(props){
             var time=moment(updateDate).format("Do MMM");
         }
         else{
-            var time=moment(updateDate).format("DD/MM/YYYY ");
+            var time=moment(updateDate).format("DD/MM/YYYY");
         }
-    
+        const color=('rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')');
+
+        const handelPress=()=>{
+            firestore()
+            .collection("chatRooms")
+            .doc(item.roomId)
+            .update({
+                doctorMessageCount:0
+            })
+            .then((data)=>{
+                console.log("done room update");
+                props.navigation.navigate('Chat',{data:item});  
+            })
+            .catch(err=>{console.log(err);})
+        }
+
         return(
             <Animatable.View animation="slideInUp" duration={500} useNativeDriver={true}>
-            <TouchableOpacity style={styles.listItem} onPress={()=>props.navigation.navigate('Chat',{data:item})}>
+            <TouchableOpacity style={styles.listItem} onPress={()=>handelPress()}>
                 {item.doctorProfilePicUrl===''?
-                    <Avatar.Text style={{alignSelf:'center'}} theme={{colors:{primary:('rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')')}}} size={49} label={lable} />
+                    <Avatar.Text style={{alignSelf:'center'}} theme={{colors:{primary:color}}} size={49} label={lable} />
                     :
                     <Avatar.Image source={{uri:item.doctorProfilePicUrl}} style={{alignSelf:'center'}} theme={{colors:{primary:'#147efb'}}} size={49} />
                 }
