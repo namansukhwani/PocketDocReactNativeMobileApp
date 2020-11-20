@@ -371,7 +371,6 @@ function Chat(props){
                         name:props.user.user.name
                     }}
                     onSend={message=>onSend(message)}
-                    renderAvatarOnTop={true}
                     scrollToBottom={true}
                     renderSend={(props)=>SendButton(props)}
                     renderActions={()=>Attachments()}
