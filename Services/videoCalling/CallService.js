@@ -47,14 +47,14 @@ class Call {
     this.setMediaDevices();
 
     return this._session
-      .getUserMedia(CallService.MEDIA_OPTIONS)
+      .getUserMedia(Call.MEDIA_OPTIONS)
       .then(stream => {
         this._session.accept({});
         return stream;
       });
   };
 
-  startCall = ids => {
+  startCall = (ids,extraData) => {
     const options = {};
     const type = ConnectyCube.videochat.CallType.VIDEO; // AUDIO is also possible
 
@@ -62,12 +62,15 @@ class Call {
     this.setMediaDevices();
     this.playSound('outgoing');
 
-    return this._session
-      .getUserMedia(CallService.MEDIA_OPTIONS)
+    return new Promise((resolve,reject)=>{ 
+      this._session
+      .getUserMedia(Call.MEDIA_OPTIONS)
       .then(stream => {
-        this._session.call({});
-        return stream;
-      });
+        this._session.call(extraData,err=>{reject(err),this.stopSounds();});
+        resolve(stream);
+      })
+      .catch((err)=>{reject(err);this.stopSounds();});
+    })
   };
 
   stopCall = () => {
@@ -82,9 +85,10 @@ class Call {
     }
   };
 
-  rejectCall = (session, extension) => {
-    this.stopSounds();
+  rejectCall = (session, extension={}) => {
     session.reject(extension);
+    this.stopSounds();
+    //this.playSound("end");
   };
 
   setAudioMuteState = mute => {
@@ -118,9 +122,9 @@ class Call {
 
   processOnCallListener(session) {
     return new Promise((resolve, reject) => {
-      // if (session.initiatorID === session.currentUserID) {
-      //   reject();
-      // }
+      if (session.initiatorID === session.currentUserID) {
+        reject();
+      }
 
       if (this._session) {
         this.rejectCall(session, { busy: true });

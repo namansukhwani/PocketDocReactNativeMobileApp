@@ -11,6 +11,8 @@ import ConnectyCube from 'react-native-connectycube';
 import { CallService } from '../Services/videoCalling/CallService';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToolBarVideoCall from './VideoCallToolbar';
+import LoadingScreen from './loadingScreen';
+
 //redux
 const mapStateToProps = state => {
     return {
@@ -30,23 +32,27 @@ function VideoCall(props) {
     const navigation = useNavigation();
     var timer;
     var backTimer;
+    
     //state
-    const [backCount, setBackCount] = useState(0);
+    const [session, setSession] = useState(null);
     const [incomingCall, setIncomingCall] = useState(false);
     const [outgoingCall, setOutgoingCall] = useState(false);
     const [inCall, setInCall] = useState(false);
     const [showToolBar, setShowToolBar] = useState(false)
     const [mic, setMic] = useState(true);
 
+    const [localStream, setLocalStream] = useState(null);
+
+    var backCount=0;
     //lifecycle
     useEffect(() => {
         checkCallType();
+        setAllListners();
         showToolBarOnPress()
-        CallService.playSound('incoming');
         const backhandler = BackHandler.addEventListener("hardwareBackPress", () => {
-            backCount === 0 ? ToastAndroid.show('Press back to End Call', ToastAndroid.SHORT) : endCall();
-            setBackCount(1);
-            backTimer=setTimeout(() => { setBackCount(0) }, 3000)
+            backCount === 1 ? endCall(): ToastAndroid.show('Press back again to End Call', ToastAndroid.SHORT);
+            backCount=1
+            backTimer=setTimeout(() => { backCount=0 }, 3000)
             return true;
         })
         //console.log(props.user.user.name);
@@ -58,33 +64,57 @@ function VideoCall(props) {
         }
     }, [])
 
-    // useFocusEffect(
-
-    //     useCallback(() => {
-    //         var backTimer;
-    //         const backhandler = BackHandler.addEventListener("hardwareBackPress", () => {
-    //             backCount === 0 ? ToastAndroid.show('Press back to End Call', ToastAndroid.SHORT) : endCall();
-    //             setBackCount(1);
-    //             backTimer = setTimeout(() => { setBackCount(0) }, 3000)
-    //             return true;
-    //         })
-
-    //         return () => {
-    //             backhandler.remove();
-    //             clearTimeout(backTimer)
-    //         }
-    //     }, [])
-    // );
-
     //method
 
     const checkCallType=()=>{
         if(props.route.params.type==="outgoing"){
+            setLocalStream(props.route.params.localStream);
             setOutgoingCall(true);
         }
         else if(props.route.params.type==="incoming"){
-            setIncomingCall(true)
+            setSession(props.route.params.session)
+            setIncomingCall(true);
         }
+    }
+
+    //call management functions
+    const rejectIncomingCall=()=>{
+        CallService.rejectCall(session);
+        navigation.goBack();
+    }
+
+    const stopCall=()=>{
+        CallService.stopCall();
+        navigation.goBack();
+    }
+
+    const micOnOff = () => {
+        setMic(!mic);
+    }
+
+    const endCall = () => {
+        if(props.route.params.type==="incoming"){
+            rejectIncomingCall();
+        }
+        else if(props.route.params.type==="outgoing"){
+            stopCall();
+        }
+        else{CallService.stopSounds();
+        CallService.playSound('end');
+        navigation.goBack();}
+    };
+
+    const switchCamera = () => {
+
+    };
+
+
+    //other methods
+
+    const setAllListners=()=>{
+        ConnectyCube.videochat.onRejectCallListener = (session, userId, extension)=>{console.log("reject call listner");};
+        ConnectyCube.videochat.onStopCallListener = (session, userId, extension) =>{console.log("Stoped call Listner");};
+        ConnectyCube.videochat.onUserNotAnswerListener = (session, userId) =>{console.log("user nat answered listner");};
     }
 
     const showToolBarOnPress = () => {
@@ -95,20 +125,7 @@ function VideoCall(props) {
         }, 7000)
     }
 
-    const micOnOff = () => {
-        setMic(!mic);
-    }
-
-    const endCall = () => {
-        CallService.stopSounds();
-        CallService.playSound('end');
-        navigation.goBack();
-    };
-
-    const switchCamera = () => {
-
-    };
-
+    
     if (incomingCall) {
         return (
             <View style={{ flex: 1, backgroundColor: '#e3f2fd' }}>
@@ -147,7 +164,7 @@ function VideoCall(props) {
                             size={50}
                             color='#fff'
                             onPress={() => {
-                                endCall()
+                                rejectIncomingCall()
                             }}
                         />
                         <Paragraph>Decline</Paragraph>
@@ -185,7 +202,7 @@ function VideoCall(props) {
                             size={50}
                             color='#fff'
                             onPress={() => {
-                                endCall()
+                                stopCall();
                             }}
                         />
                         <Paragraph>End Call</Paragraph>
@@ -203,7 +220,7 @@ function VideoCall(props) {
         );
     }
     else {
-        return (<></>);
+        return (<><LoadingScreen backgroundColor="#fff" color="#147EFB"/></>);
     }
 
 

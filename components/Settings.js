@@ -27,6 +27,7 @@ function Settings(props) {
     const animatedView = useRef(0);
     //lifecycle
     useFocusEffect(() => {
+        StatusBar.setBackgroundColor('#e3f2fd');
         animatedView.current.slideInUp(500);
     })
     return (

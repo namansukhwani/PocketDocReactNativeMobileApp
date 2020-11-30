@@ -96,6 +96,11 @@ function AppointmentsCurrent(props) {
     //states
     const todayDate = new Date();
 
+    //lifecycles
+    useFocusEffect(()=>{
+        StatusBar.setBackgroundColor('#fff');
+    })
+
     //methods
     const CardView = ({ item, index }) => {
 

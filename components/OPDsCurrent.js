@@ -94,6 +94,9 @@ function OPDsCurrent(props) {
     
     //lifecycle
     //useEffect()
+    useFocusEffect(()=>{
+        StatusBar.setBackgroundColor('#fff');
+    })
 
     //methods
 

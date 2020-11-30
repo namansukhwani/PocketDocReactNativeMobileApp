@@ -37,10 +37,12 @@ function Home(props) {
     //lifecycle
     useEffect(()=>{
         setUpCallListeners();
-    },[])
+    },[]);
+    
     useFocusEffect(
 
         useCallback(() => {
+            StatusBar.setBackgroundColor('#fff');
             animatedView.current.slideInUp(500);
             const backhandler = BackHandler.addEventListener("hardwareBackPress", () => {
                 backCount === 0 ? ToastAndroid.show('Press back to exit', ToastAndroid.SHORT) : BackHandler.exitApp();
@@ -56,20 +58,19 @@ function Home(props) {
     );
 
     //methods
-    function incomingCall(){
-        setTimeout(()=>{
-            props.navigation.navigate("VideoCall");
-        },10000)
-    }
     
     function setUpCallListeners(){
-        ConnectyCube.videochat._onCallListener=(userId,sessionId,extension)=>onIncomingCall(userId,sessionId,extension)
+        ConnectyCube.videochat.onCallListener=(session, extension)=>onIncomingCall(session,extension);
+
+        ConnectyCube.videochat.onRejectCallListener = (session, userId, extension)=>{console.log("reject call listner");};
+        ConnectyCube.videochat.onStopCallListener = (session, userId, extension) =>{console.log("Stoped call Listner");};
+        ConnectyCube.videochat.onUserNotAnswerListener = (session, userId) =>{console.log("user nat answered listner");};
     }
 
-    function onIncomingCall(userId,sessionId,extraData){
-        CallService.processOnCallListener(sessionId)
+    function onIncomingCall(session,extraData){
+        CallService.processOnCallListener(session)
         .then(()=>{
-            props.navigation.navigate("VideoCall", {type:'incoming', dataIncoming:extraData.userInfo })
+            props.navigation.navigate("VideoCall", {type:'incoming', dataIncoming:extraData,session:session })
         })
         .catch(err=>{
 
@@ -100,7 +101,7 @@ function Home(props) {
                         </View>
 
                         <View style={{flex:1,flexDirection:'row',flexGrow:1,flexWrap:'wrap',marginTop:20,justifyContent:"space-evenly"}}>
-                            <TouchableOpacity style={styles.item} onPress={()=>{incomingCall()}}>
+                            <TouchableOpacity style={styles.item} onPress={()=>{}}>
                                 <ComunityIcon name="hospital-building" size={35} style={{alignSelf:'center'}}/>
                                 <Text style={{textAlign:"center",fontSize:18,fontWeight:"bold",alignSelf:"center",marginVertical:5}}>New OPD</Text>
                                 <Paragraph style={{textAlign:"center",alignSelf:'center',fontSize:12}}>Book an OPD for any Hospital now.</Paragraph>
