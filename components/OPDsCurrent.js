@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback,useRef } from 'react';
 import { View, Text, StatusBar, Dimensions, BackHandler, ToastAndroid, StyleSheet, Animated } from 'react-native';
 import { Avatar, Button, Headline, Paragraph, RadioButton, Subheading, TextInput, Title, Card, Caption, FAB } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
@@ -86,8 +86,14 @@ function OPDsCurrent(props) {
         outputRange: [0, height + 35],
     })
 
+    //refs
+
+
     //states
     const todayDate = new Date();
+    
+    //lifecycle
+    //useEffect()
 
     //methods
 

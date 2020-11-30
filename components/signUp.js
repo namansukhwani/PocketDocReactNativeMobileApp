@@ -5,6 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import * as Animatable from 'react-native-animatable';
 import auth from '@react-native-firebase/auth';
 import {Utility} from '../utility/utility';
+import ConnectyCube from 'react-native-connectycube';
 
 export default function SignUp(props){
 
@@ -67,6 +68,7 @@ export default function SignUp(props){
                     photoURL:"user"
                 })
                 .then(user=>{
+                    signUpConnectyCube(auth().currentUser.uid,name);
                     setLoading(false);
                     global.userAuthData=auth().currentUser;
                     props.navigation.navigate("emailVerification");
@@ -99,6 +101,25 @@ export default function SignUp(props){
         .catch(err=>console.log(err))
         
     };
+
+    function signUpConnectyCube(userId,name) {
+        const userProfile = {
+            login: userId,
+            password: "123456789",
+            full_name: name,
+        };
+        ConnectyCube.createSession()
+            .then(session => {
+                console.log("Session ::", session);
+                ConnectyCube.users.signup(userProfile)
+                    .then(user => {
+                        console.log("User VC::",user);
+                    })
+                    .catch(err => { console.log("SignUp Error::",err); })
+            })
+            .catch(err => { console.log("Sesssion Error ::", err); })
+
+    }
 
     return(
         <View style={styles.container} keyboardShouldPersistTaps={true}>

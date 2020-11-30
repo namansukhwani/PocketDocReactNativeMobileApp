@@ -27,6 +27,7 @@ import OPDsCurrent from './OPDsCurrent';
 import OPDsPrevious from './OPDsPrevious';
 import AppointmentsPrevious from './AppointmentsPrevious';
 import { HeaderTitle } from '../utility/ViewUtility';
+import VideoCall from './VideoCall';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -52,7 +53,7 @@ function OPDsTab(props) {
                     activeTintColor: "#147efb",
                     inactiveTintColor: '#fff',
                 }}
-                sceneContainerStyle={{backgroundColor:'#fff'}}
+                sceneContainerStyle={{ backgroundColor: '#fff' }}
                 backBehavior="none"
                 keyboardDismissMode="auto"
                 style={{ backgroundColor: '#fff' }}
@@ -78,7 +79,7 @@ function OPDsTab(props) {
 
 function AppointmentsTab(props) {
 
-    const initialRouteName="AppointmentsCurrent";
+    const initialRouteName = "AppointmentsCurrent";
 
     return (
         <>
@@ -91,7 +92,7 @@ function AppointmentsTab(props) {
                     activeTintColor: "#147efb",
                     inactiveTintColor: '#fff',
                 }}
-                sceneContainerStyle={{backgroundColor:'#fff'}}
+                sceneContainerStyle={{ backgroundColor: '#fff' }}
                 backBehavior="none"
                 keyboardDismissMode="auto"
                 style={{ backgroundColor: '#fff' }}
@@ -126,7 +127,7 @@ function BottomDrawer(props) {
 
             }}
             screenOptions={{
-                unmountOnBlur: true
+                unmountOnBlur: false
             }}
             initialRouteName="userHome"
         >
@@ -352,7 +353,13 @@ export default function Main() {
                     component={ChangeEmail}
                 />
 
-
+                <Stack.Screen
+                    name="VideoCall"
+                    options={({ route, navigation }) => ({
+                        headerShown: false
+                    })}
+                    component={VideoCall}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     )

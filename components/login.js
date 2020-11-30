@@ -8,6 +8,8 @@ import auth from '@react-native-firebase/auth';
 import {Utility} from '../utility/utility';
 import {connect} from 'react-redux';
 import {getUserDetails} from '../redux/ActionCreators';
+import Toast from 'react-native-simple-toast';
+import {AuthService} from '../Services/videoCalling/AuthService';
 
 //redux
 const mapStateToProps=state =>{
@@ -23,6 +25,7 @@ const mapDispatchToProps=(dispatch) => ({
 //component
 function Login(props){
 
+    //states
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error1, setError1] = useState(false)
@@ -31,13 +34,13 @@ function Login(props){
     const [loading, setLoading] = useState(false);
     const [showPass, setShowPass] = useState(false);
 
+    var firstTime=true;
+    
     useEffect(()=>{
-
         const userChangeListner=auth().onAuthStateChanged((user)=>{
-            console.log(user);
+            //console.log(user);
 
                 if(user!==null){
-                   
                     const utility=new Utility();
                     utility.checkNetwork()
                     .then(()=>{
@@ -48,7 +51,10 @@ function Login(props){
                         .catch(err=>console.log(err))
                         if(user.photoURL==="user"){
                             if(user.emailVerified){
-                                checkUserData(user.uid,true);
+                                if(firstTime){
+                                    firstTime=false;
+                                    checkUserData(user.uid,true);
+                                }
                             }
                             else{
                                 setLoading(false);
@@ -77,10 +83,11 @@ function Login(props){
 
     //methods
     const checkUserData=(uid,first)=>{
+        //console.log("THIS IS FUCKING SHIT");
         props.getUserDetails(uid)
         .then(()=>{
            
-                if(first){
+                if(first){                    
                     setCheckingLogin(false);
                 }
                 else{
@@ -89,6 +96,11 @@ function Login(props){
                     setPassword('');
                 }
                 props.navigation.navigate("home");
+                AuthService.login(uid)
+                .then(()=>{console.log();
+                    
+                })
+                .catch(err=>{console.log(err);})
             
         })
         .catch((err)=>{
@@ -101,8 +113,13 @@ function Login(props){
                     setEmail('');
                     setPassword('');
                 }
-                
                 props.navigation.navigate("getNewUserData");
+
+                AuthService.login(uid)
+                .then(()=>{console.log();
+                })
+                .catch(err=>{console.log(err);})
+                
                 
             }
             setCheckingLogin(false);

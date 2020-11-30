@@ -14,6 +14,14 @@ target 'PocketDoc' do
 
   pod 'lottie-react-native', :path => '../node_modules/lottie-react-native'
 
+  pod 'react-native-webrtc', :path => '../node_modules/react-native-webrtc'
+
+  pod 'ReactNativeIncallManager', :path => '../node_modules/react-native-incall-manager'
+
+  pod 'RNSound', :path => '../node_modules/react-native-sound'
+
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
   target 'PocketDocTests' do
     inherit! :complete
     # Pods for testing

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback,useRef } from 'react';
 import { View, Text, StatusBar, BackHandler, ToastAndroid, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Avatar, Button, Headline, Paragraph, RadioButton, Subheading, TextInput, Title, } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
@@ -12,6 +12,8 @@ import * as Animatable from 'react-native-animatable';
 import AntIcons from 'react-native-vector-icons/AntDesign';
 import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/Ionicons';
+import ConnectyCube from 'react-native-connectycube';
+import { CallService } from '../Services/videoCalling/CallService';
 
 //redux
 const mapStateToProps = state => {
@@ -26,13 +28,20 @@ const mapDispatchToProps = (dispatch) => ({
 
 function Home(props) {
 
+    //refs
+    const animatedView=useRef(0);
+    //states
     const userData = auth().currentUser.providerData;
     const [backCount, setBackCount] = useState(0);
 
     //lifecycle
-
+    useEffect(()=>{
+        setUpCallListeners();
+    },[])
     useFocusEffect(
+
         useCallback(() => {
+            animatedView.current.slideInUp(500);
             const backhandler = BackHandler.addEventListener("hardwareBackPress", () => {
                 backCount === 0 ? ToastAndroid.show('Press back to exit', ToastAndroid.SHORT) : BackHandler.exitApp();
                 setBackCount(1);
@@ -47,7 +56,29 @@ function Home(props) {
     );
 
     //methods
+    function incomingCall(){
+        setTimeout(()=>{
+            props.navigation.navigate("VideoCall");
+        },10000)
+    }
+    
+    function setUpCallListeners(){
+        ConnectyCube.videochat._onCallListener=(userId,sessionId,extension)=>onIncomingCall(userId,sessionId,extension)
+    }
 
+    function onIncomingCall(userId,sessionId,extraData){
+        CallService.processOnCallListener(sessionId)
+        .then(()=>{
+            props.navigation.navigate("VideoCall", {type:'incoming', dataIncoming:extraData.userInfo })
+        })
+        .catch(err=>{
+
+        })
+        // console.log("userId::",userId);
+        // console.log("sessionId::",sessionId);
+        //console.log("data::",extraData);
+        
+    }
     //component
 
     return (
@@ -56,7 +87,7 @@ function Home(props) {
                 <StatusBar backgroundColor="#fff" barStyle='dark-content' />
                 <HomeHeader profilePic={props.user.user.profilePictureUrl} name={props.user.user.name} phoneNo={props.user.user.phoneNo} onPress={()=>{props.navigation.navigate("Settings")}}/>
                 <ScrollView contentContainerStyle={{paddingBottom:'15%'}}>
-                    <Animatable.View animation="slideInUp" style={{ padding: 15 }} duration={500} delay={50} useNativeDriver={true}>
+                    <Animatable.View animation="slideInUp" style={{ padding: 15 }} ref={ref=>animatedView.current=ref}  duration={500} useNativeDriver={true}>
                         <View style={{backgroundColor:"#147efb",borderRadius:20,elevation:10}}>
                             <LottieView
                                 source={require('../assets/doctor_animation.json')}
@@ -69,7 +100,7 @@ function Home(props) {
                         </View>
 
                         <View style={{flex:1,flexDirection:'row',flexGrow:1,flexWrap:'wrap',marginTop:20,justifyContent:"space-evenly"}}>
-                            <TouchableOpacity style={styles.item}>
+                            <TouchableOpacity style={styles.item} onPress={()=>{incomingCall()}}>
                                 <ComunityIcon name="hospital-building" size={35} style={{alignSelf:'center'}}/>
                                 <Text style={{textAlign:"center",fontSize:18,fontWeight:"bold",alignSelf:"center",marginVertical:5}}>New OPD</Text>
                                 <Paragraph style={{textAlign:"center",alignSelf:'center',fontSize:12}}>Book an OPD for any Hospital now.</Paragraph>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StatusBar, BackHandler, ToastAndroid, StyleSheet, ScrollView } from 'react-native';
 import { Avatar, Button, Headline, Paragraph, List, Title, } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
@@ -23,11 +23,17 @@ const mapDispatchToProps = (dispatch) => ({
 
 //component 
 function Settings(props) {
+    //refs
+    const animatedView = useRef(0);
+    //lifecycle
+    useFocusEffect(() => {
+        animatedView.current.slideInUp(500);
+    })
     return (
         <View style={{ flex: 1, backgroundColor: "#fff" }}>
             <StatusBar backgroundColor="#e3f2fd" barStyle="dark-content" translucent={false} />
             <ScrollView >
-                <Animatable.View animation="slideInUp" style={{backgroundColor:'#e3f2fd'}} duration={500} delay={50} useNativeDriver={true}>
+                <Animatable.View animation="slideInUp" ref={ref => animatedView.current = ref} style={{ backgroundColor: '#e3f2fd' }} duration={500} delay={50} useNativeDriver={true}>
                     <View style={{ paddingHorizontal: 15, }}>
                         {props.user.user.profilePictureUrl === '' ?
                             <Avatar.Image style={{ elevation: 2, alignSelf: 'center', marginBottom: 15, marginTop: 10 }} size={130} source={require('../assets/user_avatar.png')} />
@@ -48,7 +54,7 @@ function Settings(props) {
                             autoPlay={true}
                             resizeMode='contain'
                             loop={true}
-                            style={{ flex: 1,zIndex:-10,position:'absolute',width:'100%',height:'100%',opacity:0.6}}
+                            style={{ flex: 1, zIndex: -10, position: 'absolute', width: '100%', height: '100%', opacity: 0.6 }}
                             speed={0.5}
                         />
                     </View>
