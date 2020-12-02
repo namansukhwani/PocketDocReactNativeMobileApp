@@ -5,7 +5,7 @@ import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
 
 class Call {
-  static MEDIA_OPTIONS = {video: true, audio: true};
+  static MEDIA_OPTIONS = {video: { width: 1280, height: 720 }, audio: true};
 
   _session = null;
   mediaDevices = [];
