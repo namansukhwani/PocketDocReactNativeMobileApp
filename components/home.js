@@ -14,6 +14,7 @@ import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ConnectyCube from 'react-native-connectycube';
 import { CallService } from '../Services/videoCalling/CallService';
+import { EventRegister } from 'react-native-event-listeners';
 
 //redux
 const mapStateToProps = state => {
@@ -61,10 +62,11 @@ function Home(props) {
     
     function setUpCallListeners(){
         ConnectyCube.videochat.onCallListener=(session, extension)=>onIncomingCall(session,extension);
-
-        ConnectyCube.videochat.onRejectCallListener = (session, userId, extension)=>{console.log("reject call listner");};
-        ConnectyCube.videochat.onStopCallListener = (session, userId, extension) =>{console.log("Stoped call Listner");};
-        ConnectyCube.videochat.onUserNotAnswerListener = (session, userId) =>{console.log("user nat answered listner");};
+        ConnectyCube.videochat.onRemoteStreamListener=(session, userId, stream) =>{
+            console.log("remote stream from home.");
+            EventRegister.emit('onRemoteStreamListener',{session:session, userId:userId, stream:stream})
+        };
+        ConnectyCube.videochat.onAcceptCallListener = (session, userId, extension) =>{console.log("CALLER ACCEPTED YOUR CALL");};
     }
 
     function onIncomingCall(session,extraData){
