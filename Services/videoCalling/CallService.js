@@ -5,7 +5,7 @@ import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
 
 class Call {
-  static MEDIA_OPTIONS = {video: { width: 1280, height: 720 }, audio: true};
+  static MEDIA_OPTIONS = {video: true, audio: true};
 
   _session = null;
   mediaDevices = [];
@@ -15,7 +15,7 @@ class Call {
   endCall = new Sound(require('../../assets/sounds/end_call.mp3'));
 
   showToast = text => {
-    Toast.showWithGravity(text, Toast.LONG,Toast.BOTTOM);
+    Toast.show(text, Toast.LONG);
   };
 
   getUserById = (userId) => {
