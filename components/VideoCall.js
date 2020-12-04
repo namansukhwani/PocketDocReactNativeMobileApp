@@ -7,7 +7,7 @@ import { } from '../redux/ActionCreators';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import moment from 'moment';
-import ConnectyCube,{RTCView} from 'react-native-connectycube';
+import ConnectyCube, { RTCView } from 'react-native-connectycube';
 import { CallService } from '../Services/videoCalling/CallService';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToolBarVideoCall from './VideoCallToolbar';
@@ -34,7 +34,7 @@ function VideoCall(props) {
     const navigation = useNavigation();
     var timer;
     var backTimer;
-    
+
     //state
     const [session, setSession] = useState(null);
     const [incomingCall, setIncomingCall] = useState(false);
@@ -47,7 +47,7 @@ function VideoCall(props) {
     const [localStream, setLocalStream] = useState(null);
     const [otherUserStream, setOtherUserStream] = useState(null);
 
-    var backCount=0;
+    var backCount = 0;
     //lifecycle
     useEffect(() => {
         checkCallType();
@@ -55,24 +55,24 @@ function VideoCall(props) {
         showToolBarOnPress()
         //CallService.setSpeakerphoneOn(true);
         const backhandler = BackHandler.addEventListener("hardwareBackPress", () => {
-            backCount === 1 ? endCall(): ToastAndroid.show('Press back again to End Call', ToastAndroid.SHORT);
-            backCount=1
-            backTimer=setTimeout(() => { backCount=0 }, 3000)
+            backCount === 1 ? endCall() : ToastAndroid.show('Press back again to End Call', ToastAndroid.SHORT);
+            backCount = 1
+            backTimer = setTimeout(() => { backCount = 0 }, 3000)
             return true;
         })
         //console.log(props.user.user.name);
 
-        const onRemoteStreamListener=EventRegister.addEventListener('onRemoteStreamListener',(data)=>{
+        const onRemoteStreamListener = EventRegister.addEventListener('onRemoteStreamListener', (data) => {
             console.log("remote stream here.");
-            _onRemoteStreamListener(data.session,data.userId,data.stream);
+            _onRemoteStreamListener(data.session, data.userId, data.stream);
         });
 
-        const onAcceptCallListener=EventRegister.addEventListener('onAcceptCallListener',(data)=>{
-            _onAcceptCallListener(data.session,data.userId,data.extension);
+        const onAcceptCallListener = EventRegister.addEventListener('onAcceptCallListener', (data) => {
+            _onAcceptCallListener(data.session, data.userId, data.extension);
         })
 
-        const onUserNotAnswerListener=EventRegister.addEventListener('onUserNotAnswerListener',data=>{
-            _onUserNotAnswerListener(data.session,data.userId);
+        const onUserNotAnswerListener = EventRegister.addEventListener('onUserNotAnswerListener', data => {
+            _onUserNotAnswerListener(data.session, data.userId);
         })
 
         return () => {
@@ -87,41 +87,41 @@ function VideoCall(props) {
 
     //method
 
-    const checkCallType=()=>{
-        if(props.route.params.type==="outgoing"){
+    const checkCallType = () => {
+        if (props.route.params.type === "outgoing") {
             setLocalStream(props.route.params.localStream);
             setOutgoingCall(true);
         }
-        else if(props.route.params.type==="incoming"){
+        else if (props.route.params.type === "incoming") {
             setSession(props.route.params.session)
             setIncomingCall(true);
         }
     }
 
     //call management functions
-    const acceptIncomingCall=()=>{
+    const acceptIncomingCall = () => {
         CallService.acceptCall(session)
-        .then(localStream=>{
-            setLocalStream(localStream);
+            .then(localStream => {
+                setLocalStream(localStream);
 
-            InCallManager.start({media:'video'})
-            .then(()=>{
-                InCallManager.setKeepScreenOn(true);
-                InCallManager.setForceSpeakerphoneOn(true);
-                InCallManager.chooseAudioRoute('SPEAKER_PHONE');
-            });
+                InCallManager.start({ media: 'video' })
+                    .then(() => {
+                        InCallManager.setKeepScreenOn(true);
+                        InCallManager.setForceSpeakerphoneOn(true);
+                        InCallManager.chooseAudioRoute('SPEAKER_PHONE');
+                    });
 
-            //CallService.setSpeakerphoneOn(true);
-        })
-        .catch(err=>console.log(err));
+                //CallService.setSpeakerphoneOn(true);
+            })
+            .catch(err => console.log(err));
     };
 
-    const rejectIncomingCall=()=>{
+    const rejectIncomingCall = () => {
         CallService.rejectCall(session);
         navigation.goBack();
     }
 
-    const stopCall=()=>{
+    const stopCall = () => {
         InCallManager.stop();
         CallService.stopCall();
         navigation.goBack();
@@ -133,13 +133,13 @@ function VideoCall(props) {
     }
 
     const endCall = () => {
-        if(inCall){
+        if (inCall) {
             stopCall();
         }
-        else if(props.route.params.type==="incoming"){
+        else if (props.route.params.type === "incoming") {
             rejectIncomingCall();
         }
-        else if(props.route.params.type==="outgoing"){
+        else if (props.route.params.type === "outgoing") {
             stopCall();
         }
         // else{CallService.stopSounds();
@@ -154,49 +154,49 @@ function VideoCall(props) {
 
     //other methods
 
-    const setAllListners=()=>{
-        ConnectyCube.videochat.onRejectCallListener = (session, userId, extension)=>{_onRejectCall(session,userId,extension)};
-        ConnectyCube.videochat.onStopCallListener = (session, userId, extension) =>{_onStopCallListener(session,userId,extension)};
+    const setAllListners = () => {
+        ConnectyCube.videochat.onRejectCallListener = (session, userId, extension) => { _onRejectCall(session, userId, extension) };
+        ConnectyCube.videochat.onStopCallListener = (session, userId, extension) => { _onStopCallListener(session, userId, extension) };
     }
 
-    const _onUserNotAnswerListener = (session, userId) =>{
+    const _onUserNotAnswerListener = (session, userId) => {
         //console.log("USER NOT ACCEPTING YOU CALL");
-        const toast=props.route.params.data.doctorName+" didn't answered your call";
-        ToastAndroid.show(toast,ToastAndroid.LONG);
+        const toast = props.route.params.data.doctorName + " didn't answered your call";
+        ToastAndroid.show(toast, ToastAndroid.LONG);
         stopCall();
     }
 
-    const _onAcceptCallListener = (session, userId, extension) =>{
+    const _onAcceptCallListener = (session, userId, extension) => {
         CallService.stopSounds();
-        InCallManager.start({media:'video'})
+        InCallManager.start({ media: 'video' })
         InCallManager.setKeepScreenOn(true);
         InCallManager.setForceSpeakerphoneOn(true);
         InCallManager.chooseAudioRoute('SPEAKER_PHONE');
-                //CallService.setSpeakerphoneOn(true);
+        //CallService.setSpeakerphoneOn(true);
         setOutgoingCall(false);
     }
 
-    const  _onStopCallListener = (session, userId, extension) => {
+    const _onStopCallListener = (session, userId, extension) => {
         stopCall();
     }
 
-    const _onRemoteStreamListener=(session, userId, stream) => {
+    const _onRemoteStreamListener = (session, userId, stream) => {
         // console.log("remote stream  !!!");
         // console.log("this is a remote stream :::::::",stream);
         CallService.processOnRemoteStreamListener()
-        .then(()=>{
-            setOtherUserStream(stream);
-            setIncomingCall(false);
-            setInCall(true);
-        });
+            .then(() => {
+                setOtherUserStream(stream);
+                setIncomingCall(false);
+                setInCall(true);
+            });
     }
 
-    const _onRejectCall=(session, userId, extension)=>{
+    const _onRejectCall = (session, userId, extension) => {
         CallService.processOnRejectCallListener(session, userId, extension)
-        .then(()=>{
-            stopCall();
-        })
-        .catch(err=>console.log(err))
+            .then(() => {
+                stopCall();
+            })
+            .catch(err => console.log(err))
     }
 
     const showToolBarOnPress = () => {
@@ -209,7 +209,7 @@ function VideoCall(props) {
         }, 7000)
     }
 
-    
+
     if (incomingCall) {
         return (
             <View style={{ flex: 1, backgroundColor: '#e3f2fd' }}>
@@ -299,29 +299,29 @@ function VideoCall(props) {
         return (
             <TouchableOpacity activeOpacity={1} onPress={() => showToolBarOnPress()} style={{ flex: 1, backgroundColor: '#000' }}>
                 <StatusBar backgroundColor="#000" barStyle="light-content" />
-                <View style={{flex:1,backgroundColor:'#000',borderRadius:20,overflow:'hidden'}}>
-                <RTCView
-                    objectFit="cover"
-                    style={{flex:1,backgroundColor:'#000',}}
-                    key='otherUser'
-                    streamURL={otherUserStream.toURL()}
-                />
+                <View style={{ flex: 1, backgroundColor: '#000', borderRadius: 20, overflow: 'hidden' }}>
+                    <RTCView
+                        objectFit="cover"
+                        style={{ flex: 1, backgroundColor: '#000', }}
+                        key='otherUser'
+                        streamURL={otherUserStream.toURL()}
+                    />
                 </View>
-                <View style={{...styles.localStream,bottom:bottomHeight}}>
-                <RTCView
-                    objectFit="cover"
-                    style={{flex:1,backgroundColor:'#000',}}
-                    key='localStream'
-                    streamURL={localStream.toURL()}
-                    zOrder={-10}
-                />
+                <View style={{ ...styles.localStream, bottom: bottomHeight }}>
+                    <RTCView
+                        objectFit="cover"
+                        style={{ flex: 1, backgroundColor: '#000', }}
+                        key='localStream'
+                        streamURL={localStream.toURL()}
+                        zOrder={-10}
+                    />
                 </View>
                 <ToolBarVideoCall visible={showToolBar} endCall={() => stopCall()} switchCamera={() => switchCamera()} micOnOff={() => micOnOff()} mic={mic} />
             </TouchableOpacity>
         );
     }
     else {
-        return (<><LoadingScreen backgroundColor="#000" color="#147EFB"/></>);
+        return (<><LoadingScreen backgroundColor="#000" color="#147EFB" /></>);
     }
 
 
@@ -346,16 +346,16 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         justifyContent: 'center'
     },
-    localStream:{
-        backgroundColor:'#000',
-        position:'absolute',
-        width:90,
-        height:160,
-        borderRadius:10,
-        right:20,
-        overflow:'hidden',
-        elevation:10,
-        zIndex:10
+    localStream: {
+        backgroundColor: '#000',
+        position: 'absolute',
+        width: 90,
+        height: 160,
+        borderRadius: 10,
+        right: 20,
+        overflow: 'hidden',
+        elevation: 10,
+        zIndex: 10
     }
 });
 

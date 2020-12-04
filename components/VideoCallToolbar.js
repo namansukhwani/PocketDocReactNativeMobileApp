@@ -17,11 +17,11 @@ export default function ToolBarVideoCall(props) {
     const MicOnOffButton = () => {
         return (
             <IconButton
-                icon={props.mic? "microphone":"microphone-off"}
+                icon={props.mic ? "microphone" : "microphone-off"}
                 style={{ backgroundColor: '#147efb' }}
                 size={35}
                 color='#fff'
-                onPress={() => {  props.micOnOff()}}
+                onPress={() => { props.micOnOff() }}
             />
         )
     }
@@ -56,13 +56,13 @@ export default function ToolBarVideoCall(props) {
         return (
             <View style={styles.container}>
                 <View style={styles.toolBarItem}>
-                    <MicOnOffButton/>
+                    <MicOnOffButton />
                 </View>
                 <View style={styles.toolBarItem}>
-                    <EndCallButton/>
+                    <EndCallButton />
                 </View>
                 <View style={styles.toolBarItem}>
-                    <SwitchButton/>
+                    <SwitchButton />
                 </View>
             </View>
         );
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         height: 60,
-        width:'100%',
+        width: '100%',
         justifyContent: 'center',
         flexDirection: 'row',
         zIndex: 100,

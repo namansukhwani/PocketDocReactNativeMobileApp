@@ -97,7 +97,7 @@ function AppointmentsCurrent(props) {
     const todayDate = new Date();
 
     //lifecycles
-    useFocusEffect(()=>{
+    useFocusEffect(() => {
         StatusBar.setBackgroundColor('#fff');
     })
 
@@ -140,7 +140,7 @@ function AppointmentsCurrent(props) {
                     <Card.Content style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
                         <View style={{ flexDirection: "row" }}>
                             <Fontisto name="doctor" size={30} style={{ margin: 5, marginRight: 10, alignSelf: "center" }} color="#147efb" />
-                            <Title style={{ paddingVertical: 0,alignSelf:"center", marginVertical: 0, flex: 1 }}>{item.name}</Title>
+                            <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.name}</Title>
 
                         </View>
                         <Caption style={{ marginVertical: 0, padding: 0 }}>{item.spec}</Caption>
@@ -162,7 +162,7 @@ function AppointmentsCurrent(props) {
 
     return (
         <View style={{ flex: 1, backgroundColor: "#fff", }}>
-            <StatusBar backgroundColor="#fff" barStyle="dark-content"/>
+            <StatusBar backgroundColor="#fff" barStyle="dark-content" />
             <Animated.FlatList
                 data={DATA}
                 renderItem={CardView}

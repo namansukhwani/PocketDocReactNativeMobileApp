@@ -245,7 +245,7 @@ function EditProfile(props) {
             setError3(true)
             ToastAndroid.show("Enter a correct Pincode", ToastAndroid.LONG);
         }
-        else if (name === props.user.user.name || phoneNo === props.user.user.phoneNo || gender === props.user.user.gender || dob.getDate() === new Date(props.user.user.dob).getDate() || address === props.user.user.address || landmark === props.user.user.landmark || state === props.user.user.state || city === props.user.user.city || country === props.user.user.country||pincode===props.user.user.pincode) {
+        else if (name === props.user.user.name || phoneNo === props.user.user.phoneNo || gender === props.user.user.gender || dob.getDate() === new Date(props.user.user.dob).getDate() || address === props.user.user.address || landmark === props.user.user.landmark || state === props.user.user.state || city === props.user.user.city || country === props.user.user.country || pincode === props.user.user.pincode) {
             ToastAndroid.show("No changes to update.", ToastAndroid.LONG);
             return;
         }
@@ -291,7 +291,7 @@ function EditProfile(props) {
     return (
         <>
             <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                <StatusBar backgroundColor="#000" barStyle='light-content'  />
+                <StatusBar backgroundColor="#000" barStyle='light-content' />
                 <KeyboardAwareScrollView enableOnAndroid={true} extraHeight={100} showsVerticalScrollIndicator={false} >
                     <Animatable.View animation="slideInUp" style={{ padding: 15 }} duration={400} useNativeDriver={true}>
                         <TouchableOpacity style={styles.avatar} onPress={() => modalizeRef.current?.open()}>

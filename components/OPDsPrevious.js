@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StatusBar, Dimensions, BackHandler, ToastAndroid, StyleSheet, Animated } from 'react-native';
 import { Avatar, Button, Headline, Paragraph, RadioButton, Subheading, TextInput, Title, Card, Caption, FAB } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
@@ -78,6 +78,9 @@ const mapDispatchToProps = (dispatch) => ({
 //component
 function OPDsPrevious(props) {
 
+    //refs
+    const animatedView = useRef(0);
+
     //Animated 
     const scrollY = new Animated.Value(0);
     const diffClapScrollY = Animated.diffClamp(scrollY, 0, 100);
@@ -90,8 +93,9 @@ function OPDsPrevious(props) {
     const todayDate = new Date();
 
     //lifecycles
-    useFocusEffect(()=>{
+    useFocusEffect(() => {
         StatusBar.setBackgroundColor('#fff');
+        //animatedView.current.slideInRight(500);
     })
 
     //methods
@@ -134,12 +138,12 @@ function OPDsPrevious(props) {
                     <Card.Content style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
                         <View style={{ flexDirection: "row" }}>
                             <FontAwesome name="hospital" size={38} style={{ margin: 5, marginRight: 10, alignSelf: "center" }} color="#147efb" />
-                            <Title style={{ paddingVertical: 0, alignSelf:"center",marginVertical: 0, flex: 1 }}>{item.name}</Title>
+                            <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.name}</Title>
                         </View>
                         <View style={{ width: '100%' }}>
                             <Caption numberOfLines={1} style={{ overflow: "hidden", }}>{item.add}</Caption>
                         </View>
-                        <Subheading style={{ marginVertical: 0, padding: 0 }}><Subheading style={{ fontWeight: 'bold' }}>Department: </Subheading>{ item.dep}</Subheading>
+                        <Subheading style={{ marginVertical: 0, padding: 0 }}><Subheading style={{ fontWeight: 'bold' }}>Department: </Subheading>{item.dep}</Subheading>
                         <Subheading style={{ marginVertical: 0, padding: 0, fontWeight: 'bold' }}>Vist Date:</Subheading>
                         <Subheading style={styles.date}>{time}</Subheading>
 
@@ -158,19 +162,21 @@ function OPDsPrevious(props) {
     return (
         <View style={{ flex: 1, backgroundColor: "#fff" }}>
             <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-            <Animated.FlatList
-                data={DATA}
-                renderItem={CardView}
-                keyExtractor={(item, index) => index.toString()}
-                contentContainerStyle={{ paddingHorizontal: 15, marginTop: 10, paddingBottom: 24 }}
-                onScroll={Animated.event([
-                    {
-                        nativeEvent: { contentOffset: { y: scrollY } }
-                    }
-                ], { useNativeDriver: true })}
-                scrollEventThrottle={16}
-                alwaysBounceVertical={false}
-            />
+            <Animatable.View ref={ref => animatedView.current = ref} useNativeDriver={true}>
+                <Animated.FlatList
+                    data={DATA}
+                    renderItem={CardView}
+                    keyExtractor={(item, index) => index.toString()}
+                    contentContainerStyle={{ paddingHorizontal: 15, marginTop: 10, paddingBottom: 24 }}
+                    onScroll={Animated.event([
+                        {
+                            nativeEvent: { contentOffset: { y: scrollY } }
+                        }
+                    ], { useNativeDriver: true })}
+                    scrollEventThrottle={16}
+                    alwaysBounceVertical={false}
+                />
+            </Animatable.View>
             <FAB
                 label="filters"
                 icon='filter-plus'
@@ -227,4 +233,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default connect(mapStateToProps,mapDispatchToProps)(OPDsPrevious);
+export default connect(mapStateToProps, mapDispatchToProps)(OPDsPrevious);

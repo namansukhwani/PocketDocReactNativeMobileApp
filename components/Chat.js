@@ -366,12 +366,12 @@ function Chat(props) {
         CallService.getUserById(props.route.params.data.doctorId)
             .then(doctorCallId => {
                 console.log("ID::", doctorCallId);
-                CallService.startCall([doctorCallId],{name:props.user.user.name,profilePic:props.user.user.profilePictureUrl})
-                .then(localStream=>{
-                    setCallLoading(false);
-                    props.navigation.navigate("VideoCall", {type:'outgoing', data: props.route.params.data,localStream:localStream });
-                })
-                .catch(err=>{console.log(err);setCallLoading(false);});
+                CallService.startCall([doctorCallId], { name: props.user.user.name, profilePic: props.user.user.profilePictureUrl })
+                    .then(localStream => {
+                        setCallLoading(false);
+                        props.navigation.navigate("VideoCall", { type: 'outgoing', data: props.route.params.data, localStream: localStream });
+                    })
+                    .catch(err => { console.log(err); setCallLoading(false); });
                 setVideoCallVisible(false)
             })
             .catch(err => {

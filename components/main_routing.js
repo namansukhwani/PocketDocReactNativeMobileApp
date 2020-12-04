@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Alert, TouchableOpacity, ToastAndroid, StyleSheet, View, Text } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
 import { createStackNavigator, TransitionSpecs, CardStyleInterpolators, } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -28,6 +28,7 @@ import OPDsPrevious from './OPDsPrevious';
 import AppointmentsPrevious from './AppointmentsPrevious';
 import { HeaderTitle } from '../utility/ViewUtility';
 import VideoCall from './VideoCall';
+import * as Animatable from 'react-native-animatable';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,7 +44,7 @@ function TopTabLable(focused, color, title) {
 
 function OPDsTab(props) {
     return (
-        <>
+        <View style={{ flex: 1, backgroundColor: "#fff" }}>
             <HeaderTitle title="OPD" />
             <TopTab.Navigator
                 tabBarOptions={{
@@ -73,7 +74,7 @@ function OPDsTab(props) {
                     }}
                 />
             </TopTab.Navigator>
-        </>
+        </View>
     )
 }
 

@@ -64,7 +64,7 @@ function ChangeEmail(props) {
                 <Paragraph>
                     Your Current email is <Paragraph style={{ color: "#147efb" }}>{props.user.user.email}</Paragraph>
                 </Paragraph>
-                <Subheading style={{ fontWeight: "bold" }}>New Email<Subheading style={{color:'red'}}>*</Subheading></Subheading>
+                <Subheading style={{ fontWeight: "bold" }}>New Email<Subheading style={{ color: 'red' }}>*</Subheading></Subheading>
                 <TextInput
                     mode="outlined"
                     label="New Email Address*"
@@ -94,7 +94,7 @@ function ChangeEmail(props) {
                     error={error1}
                     textContentType="emailAddress"
                 />
-                <Subheading style={{ fontWeight: "bold", marginTop: 10 }}>Confirmation Password<Subheading style={{color:'red'}}>*</Subheading></Subheading>
+                <Subheading style={{ fontWeight: "bold", marginTop: 10 }}>Confirmation Password<Subheading style={{ color: 'red' }}>*</Subheading></Subheading>
                 <Paragraph>Enter your password to confirm email change.</Paragraph>
                 <TextInput
                     mode="outlined"
@@ -122,7 +122,7 @@ function ChangeEmail(props) {
                     error={error2}
                     textContentType="password"
                 />
-                
+
                 <Button mode="contained" loading={loading} icon="email-sync" style={{ marginTop: 25 }} color="#147EFB" onPress={() => changeEmail()}>Change Email</Button>
             </Animatable.View>
         </View>

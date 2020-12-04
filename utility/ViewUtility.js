@@ -37,7 +37,7 @@ export const HomeHeader = ({ profilePic, name, onPress ,phoneNo}) => {
                 {profilePic === '' ?
                     <Avatar.Image style={{ elevation: 2, alignSelf: 'center', marginLeft: 10 }} size={35} source={require('../assets/user_avatar.png')} />
                     :
-                    <Avatar.Image style={{ elevation: 2, alignSelf: 'center', marginLeft: 10 }} size={35} source={{ uri: profilePic }} />
+                    <Avatar.Image style={{ elevation: 2, alignSelf: 'center', marginLeft: 10,}} size={35} source={{ uri: profilePic }} />
                 }
             </TouchableOpacity>
         </Appbar.Header>

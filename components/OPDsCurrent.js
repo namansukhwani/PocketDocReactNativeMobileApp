@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback,useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StatusBar, Dimensions, BackHandler, ToastAndroid, StyleSheet, Animated } from 'react-native';
 import { Avatar, Button, Headline, Paragraph, RadioButton, Subheading, TextInput, Title, Card, Caption, FAB } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
@@ -91,10 +91,10 @@ function OPDsCurrent(props) {
 
     //states
     const todayDate = new Date();
-    
+
     //lifecycle
     //useEffect()
-    useFocusEffect(()=>{
+    useFocusEffect(() => {
         StatusBar.setBackgroundColor('#fff');
     })
 
@@ -138,12 +138,12 @@ function OPDsCurrent(props) {
                     <Card.Content style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
                         <View style={{ flexDirection: "row" }}>
                             <FontAwesome name="hospital" size={38} style={{ margin: 5, marginRight: 10, alignSelf: "center" }} color="#147efb" />
-                            <Title style={{ paddingVertical: 0, alignSelf:"center",marginVertical: 0, flex: 1 }}>{item.name}</Title>
+                            <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.name}</Title>
                         </View>
                         <View style={{ width: '100%' }}>
                             <Caption numberOfLines={1} style={{ overflow: "hidden", }}>{item.add}</Caption>
                         </View>
-                        <Subheading style={{ marginVertical: 0, padding: 0 }}><Subheading style={{ fontWeight: 'bold' }}>Department: </Subheading>{ item.dep}</Subheading>
+                        <Subheading style={{ marginVertical: 0, padding: 0 }}><Subheading style={{ fontWeight: 'bold' }}>Department: </Subheading>{item.dep}</Subheading>
                         <Subheading style={{ marginVertical: 0, padding: 0, fontWeight: 'bold' }}>Vist Date:</Subheading>
                         <Subheading style={styles.date}>{time}</Subheading>
 

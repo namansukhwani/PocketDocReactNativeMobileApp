@@ -5,7 +5,7 @@ import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
 
 class Call {
-  static MEDIA_OPTIONS = {video: { width: 1280, height: 720 }, audio: true};
+  static MEDIA_OPTIONS = { video: { width: 1280, height: 720 }, audio: true };
 
   _session = null;
   mediaDevices = [];
@@ -21,43 +21,45 @@ class Call {
   getUserById = (userId) => {
     const searchParams = { login: userId };
 
-    return new Promise((resolve,reject)=>{
+    return new Promise((resolve, reject) => {
       ConnectyCube.users.get(searchParams)
-      .then((result)=>{
-        //console.log("Result :::",result);
-        resolve(result.user.id.toString());
-      })
-      .catch(err=>{
-        //console.log(err);
-        reject(err);
-      })
+        .then((result) => {
+          //console.log("Result :::",result);
+          resolve(result.user.id.toString());
+        })
+        .catch(err => {
+          //console.log(err);
+          reject(err);
+        })
     })
-    
+
   };
 
   getUser = (userId, key) => {
     //const user = users.find(user => user.id == userId);
-    const searchParams={filter: {
-      field: "id",
-      param: "in",
-      value: [userId],
-    }}
-    
-    return new Promise((resolve,reject)=>{
+    const searchParams = {
+      filter: {
+        field: "id",
+        param: "in",
+        value: [userId],
+      }
+    }
+
+    return new Promise((resolve, reject) => {
       ConnectyCube.users.get(searchParams)
-      .then((result)=>{
-        //console.log("Result :::",result);
-        const user=result.items[0].user;
-        if (typeof key === 'string') {
-          //console.log(user[key]);
-          resolve(user[key]);
-        }
-    
-        resolve(user);
-      })
-      .catch(err=>{
-        reject(err)
-      })
+        .then((result) => {
+          //console.log("Result :::",result);
+          const user = result.items[0].user;
+          if (typeof key === 'string') {
+            //console.log(user[key]);
+            resolve(user[key]);
+          }
+
+          resolve(user);
+        })
+        .catch(err => {
+          reject(err)
+        })
     })
   };
 
@@ -73,19 +75,19 @@ class Call {
     this._session = session;
     this.setMediaDevices();
 
-    return new Promise((resolve,reject)=>{
+    return new Promise((resolve, reject) => {
       this._session
-      .getUserMedia(Call.MEDIA_OPTIONS)
-      .then(stream => {
-        this._session.accept({});
-        resolve(stream);
-      })
-      .catch((err)=>{reject(err);});
+        .getUserMedia(Call.MEDIA_OPTIONS)
+        .then(stream => {
+          this._session.accept({});
+          resolve(stream);
+        })
+        .catch((err) => { reject(err); });
     })
 
   };
 
-  startCall = (ids,extraData) => {
+  startCall = (ids, extraData) => {
     const options = {};
     const type = ConnectyCube.videochat.CallType.VIDEO; // AUDIO is also possible
 
@@ -93,14 +95,14 @@ class Call {
     this.setMediaDevices();
     this.playSound('outgoing');
 
-    return new Promise((resolve,reject)=>{ 
+    return new Promise((resolve, reject) => {
       this._session
-      .getUserMedia(Call.MEDIA_OPTIONS)
-      .then(stream => {
-        this._session.call(extraData,err=>{reject(err),this.stopSounds();});
-        resolve(stream);
-      })
-      .catch((err)=>{reject(err);this.stopSounds();});
+        .getUserMedia(Call.MEDIA_OPTIONS)
+        .then(stream => {
+          this._session.call(extraData, err => { reject(err), this.stopSounds(); });
+          resolve(stream);
+        })
+        .catch((err) => { reject(err); this.stopSounds(); });
     })
   };
 
@@ -116,7 +118,7 @@ class Call {
     }
   };
 
-  rejectCall = (session, extension={}) => {
+  rejectCall = (session, extension = {}) => {
     session.reject(extension);
     this.stopSounds();
   };
@@ -142,8 +144,8 @@ class Call {
       } else {
         var userName;
         this.getUser(userId, 'full_name')
-        .then(result=>userName=result)
-        .catch(err=>console.log(err));
+          .then(result => userName = result)
+          .catch(err => console.log(err));
         const message = `${userName} did not answer`;
 
         this.showToast(message);
@@ -163,10 +165,10 @@ class Call {
         this.rejectCall(session, { busy: true });
         reject();
       }
-      else{
-      this.playSound('incoming');
+      else {
+        this.playSound('incoming');
 
-      resolve();
+        resolve();
       }
     });
   }
@@ -181,8 +183,8 @@ class Call {
       } else {
         var userName;
         this.getUser(userId, 'full_name')
-        .then(result=>userName=result)
-        .catch(err=>console.log(err));
+          .then(result => userName = result)
+          .catch(err => console.log(err));
         const message = `${userName} has accepted the call`;
 
         this.showToast(message);
@@ -203,14 +205,14 @@ class Call {
       } else {
         this.stopSounds();
         this.getUser(userId, 'full_name')
-        .then(result=>{
-          const message = extension.busy
-          ? `${result} is busy`
-          : `${result} rejected your call`;
+          .then(result => {
+            const message = extension.busy
+              ? `${result} is busy`
+              : `${result} rejected your call`;
 
-          this.showToast(message);
-        })
-        .catch(err=>console.log(err));
+            this.showToast(message);
+          })
+          .catch(err => console.log(err));
 
         resolve();
       }
@@ -225,17 +227,16 @@ class Call {
         reject();
       } else {
         this.getUser(userId, 'full_name')
-        .then(result=>{
-          const message = `${result} has ${
-          isInitiator ? 'stopped' : 'left'
-          } the call`;
+          .then(result => {
+            const message = `${result} has ${isInitiator ? 'stopped' : 'left'
+              } the call`;
 
-          this.showToast(message);
+            this.showToast(message);
 
-          resolve();
-        })
-        .catch(err=>reject(err));
-        
+            resolve();
+          })
+          .catch(err => reject(err));
+
       }
     });
   }
@@ -279,4 +280,4 @@ class Call {
   };
 }
 
-export const CallService=new Call();
+export const CallService = new Call();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text,Dimensions, StatusBar, BackHandler, ToastAndroid, StyleSheet, FlatList,Animated } from 'react-native';
+import { View, Text, Dimensions, StatusBar, BackHandler, ToastAndroid, StyleSheet, FlatList, Animated } from 'react-native';
 import { Avatar, Button, Headline, Paragraph, RadioButton, Subheading, TextInput, Title, Card, Caption, FAB } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 import { connect } from 'react-redux';
@@ -10,7 +10,7 @@ import * as Animatable from 'react-native-animatable';
 import moment from 'moment';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 
-const height=Dimensions.get('screen').height;
+const height = Dimensions.get('screen').height;
 
 const DATA = [
     {
@@ -96,10 +96,10 @@ function AppointmentsPrevious(props) {
     const todayDate = new Date();
 
     //lifecycles
-    useFocusEffect(()=>{
+    useFocusEffect(() => {
         StatusBar.setBackgroundColor('#fff');
     })
-    
+
     //methods
     const CardView = ({ item, index }) => {
 
@@ -137,9 +137,9 @@ function AppointmentsPrevious(props) {
             <Animatable.View animation="slideInUp" style={{ marginBottom: 10 }} duration={500} delay={50} useNativeDriver={true}>
                 <Card style={styles.card} onPress={() => { console.log("hello"); }}>
                     <Card.Content style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
-                    <View style={{ flexDirection: "row" }}>
+                        <View style={{ flexDirection: "row" }}>
                             <Fontisto name="doctor" size={30} style={{ margin: 5, marginRight: 10, alignSelf: "center" }} color="#147efb" />
-                            <Title style={{ paddingVertical: 0,alignSelf:"center", marginVertical: 0, flex: 1 }}>{item.name}</Title>
+                            <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.name}</Title>
 
                         </View>
                         <Caption style={{ marginVertical: 0, padding: 0 }}>{item.spec}</Caption>
@@ -161,7 +161,7 @@ function AppointmentsPrevious(props) {
 
     return (
         <View style={{ flex: 1, backgroundColor: "#fff", }}>
-            <StatusBar backgroundColor="#fff" barStyle="dark-content"/>
+            <StatusBar backgroundColor="#fff" barStyle="dark-content" />
             <Animated.FlatList
                 data={DATA}
                 renderItem={CardView}
