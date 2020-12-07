@@ -123,7 +123,7 @@ function GetNewUserData(props) {
                         pincode: pincode,
                         verificationType: "",
                         verificatonDocUrl: "",
-                        medicalHistory: []
+                        //medicalHistory: []
                     })
 
                     props.addUserDetails(userAuthData.uid, userData)
