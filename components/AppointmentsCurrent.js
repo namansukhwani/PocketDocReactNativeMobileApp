@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback,useRef} from 'react';
 import { View, Text, Dimensions, StatusBar, BackHandler, ToastAndroid, StyleSheet, FlatList, Animated } from 'react-native';
 import { Avatar, Button, Headline, Paragraph, RadioButton, FAB, Subheading, TextInput, Title, Card, Caption } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
@@ -85,6 +85,10 @@ const mapDispatchToProps = (dispatch) => ({
 
 //component
 function AppointmentsCurrent(props) {
+
+    //ref
+    const animatedView=useRef(0);
+
     //Animated 
     const scrollY = new Animated.Value(0);
     const diffClapScrollY = Animated.diffClamp(scrollY, 0, 100);
@@ -97,9 +101,11 @@ function AppointmentsCurrent(props) {
     const todayDate = new Date();
 
     //lifecycles
-    useFocusEffect(() => {
+    useFocusEffect(
+        useCallback(() => {
         StatusBar.setBackgroundColor('#fff');
-    })
+    },[])
+    )
 
     //methods
     const CardView = ({ item, index }) => {

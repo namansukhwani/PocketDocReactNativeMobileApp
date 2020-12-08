@@ -25,11 +25,15 @@ const mapDispatchToProps = (dispatch) => ({
 function Settings(props) {
     //refs
     const animatedView = useRef(0);
+    
     //lifecycle
-    useFocusEffect(() => {
+    useFocusEffect(
+        useCallback(() => {
         StatusBar.setBackgroundColor('#e3f2fd');
         animatedView.current.slideInUp(500);
-    })
+    },[])
+    )
+
     return (
         <View style={{ flex: 1, backgroundColor: "#fff" }}>
             <StatusBar backgroundColor="#e3f2fd" barStyle="dark-content" translucent={false} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StatusBar, BackHandler, ToastAndroid, StyleSheet, TouchableOpacity } from 'react-native';
 import { Avatar, Button, Headline, Paragraph, RadioButton, Subheading, TextInput, Title, Searchbar, Badge } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
@@ -30,7 +30,7 @@ const mapDispatchToProps = (dispatch) => ({
 function AllChats(props) {
 
     //refs
-    const animationView=useRef(0);
+    const animationView = useRef(0);
 
     //states
     const [search, setSearch] = useState('');
@@ -40,15 +40,18 @@ function AllChats(props) {
 
     //lifecycle
 
-    useFocusEffect(() => {
-        StatusBar.setBackgroundColor('#fff');
-        animationView.current.slideInUp(500);
-    })
+    useFocusEffect(
+        useCallback(() => {
+            //console.log("lodu");
+            StatusBar.setBackgroundColor('#fff');
+            animationView.current.slideInUp(500);
+        }, [])
+    );
 
     useEffect(() => {
         setFilteredData(
             data.filter(doc => {
-                return doc.userName.toLowerCase().includes(search.toLowerCase())
+                return doc.doctorName.toLowerCase().includes(search.toLowerCase())
             })
         )
     }, [search, data])
@@ -166,7 +169,7 @@ function AllChats(props) {
                 />
             </View>
 
-            <Animatable.View ref={ref=>animationView.current=ref} useNativeDriver={true}>
+            <Animatable.View style={{ flex: 1 }} ref={ref => animationView.current = ref} useNativeDriver={true}>
                 {loading ?
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         <Spinner

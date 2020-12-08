@@ -96,9 +96,11 @@ function AppointmentsPrevious(props) {
     const todayDate = new Date();
 
     //lifecycles
-    useFocusEffect(() => {
+    useFocusEffect(
+        useCallback(() => {
         StatusBar.setBackgroundColor('#fff');
-    })
+    },[])
+    )
 
     //methods
     const CardView = ({ item, index }) => {

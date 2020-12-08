@@ -93,10 +93,11 @@ function OPDsPrevious(props) {
     const todayDate = new Date();
 
     //lifecycles
-    useFocusEffect(() => {
+    useFocusEffect(
+        useCallback(() => {
         StatusBar.setBackgroundColor('#fff');
-        //animatedView.current.slideInRight(500);
-    })
+    },[])
+    )
 
     //methods
 
