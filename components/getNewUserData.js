@@ -11,6 +11,7 @@ import { Utility } from '../utility/utility';
 import { useFocusEffect } from '@react-navigation/native';
 import { connect } from 'react-redux';
 import { addUserDetails } from '../redux/ActionCreators';
+import firestore from '@react-native-firebase/firestore';
 
 //redux 
 const mapStateToProps = state => {
@@ -107,7 +108,7 @@ function GetNewUserData(props) {
             utility.checkNetwork()
                 .then(() => {
 
-                    const userData = JSON.stringify({
+                    const userData = {
                         userId: userAuthData.uid,
                         email: email,
                         phoneNo: phoneNo,
@@ -123,8 +124,9 @@ function GetNewUserData(props) {
                         pincode: pincode,
                         verificationType: "",
                         verificatonDocUrl: "",
-                        //medicalHistory: []
-                    })
+                        //medicalHistory: [],
+                        userCreateTimestamp:firestore.Timestamp.now()
+                    }
 
                     props.addUserDetails(userAuthData.uid, userData)
                         .then(() => {

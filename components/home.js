@@ -116,7 +116,7 @@ function Home(props) {
                                 <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold", alignSelf: "center", marginVertical: 5 }}>New OPD</Text>
                                 <Paragraph style={{ textAlign: "center", alignSelf: 'center', fontSize: 12 }}>Book an OPD for any Hospital now.</Paragraph>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.item}>
+                            <TouchableOpacity style={styles.item} onPress={() => {props.navigation.navigate("NewAppointment") }} >
                                 <ComunityIcon name="calendar-plus" size={40} style={{ alignSelf: 'center' }} />
                                 <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold", alignSelf: "center", marginVertical: 5 }}>New Appointment</Text>
                                 <Paragraph style={{ textAlign: "center", alignSelf: 'center', fontSize: 12 }}>Book an appointment with a Doctor.</Paragraph>
@@ -127,17 +127,18 @@ function Home(props) {
                                 <Paragraph style={{ textAlign: "center", alignSelf: 'center', fontSize: 12 }}>Book a medical test.</Paragraph>
                             </TouchableOpacity>
 
+                            <TouchableOpacity style={styles.item} onPress={() => {}}>
+                                <Icon name="file-tray-full" size={40} style={{ alignSelf: 'center' }} />
+                                <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold", alignSelf: "center", marginVertical: 5 }}>Previous Test Results</Text>
+                                <Paragraph style={{ textAlign: "center", alignSelf: 'center', fontSize: 12 }}>View all your previous test results.</Paragraph>
+                            </TouchableOpacity>
+
                             <TouchableOpacity style={styles.item}>
                                 <ComunityIcon name="file-multiple" size={35} style={{ alignSelf: 'center' }} />
                                 <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold", alignSelf: "center", marginVertical: 5 }}>Medical Records</Text>
                                 <Paragraph style={{ textAlign: "center", alignSelf: 'center', fontSize: 12 }}>View your medical records.</Paragraph>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.item} onPress={() => props.navigation.navigate("Appointments")}>
-                                <Icon name="file-tray-full" size={40} style={{ alignSelf: 'center' }} />
-                                <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold", alignSelf: "center", marginVertical: 5 }}>Previous Appointments</Text>
-                                <Paragraph style={{ textAlign: "center", alignSelf: 'center', fontSize: 12 }}>View all your previous Appointments.</Paragraph>
-                            </TouchableOpacity>
                             <TouchableOpacity style={styles.item}>
                                 <ComunityIcon name="file-certificate-outline" size={45} style={{ alignSelf: 'center' }} />
                                 <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold", alignSelf: "center", marginVertical: 5 }}>Prescriptions</Text>

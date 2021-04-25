@@ -82,9 +82,9 @@ function EditProfile(props) {
                     task.snapshot.ref.getDownloadURL()
                         .then(url => {
 
-                            const updateData = JSON.stringify({
+                            const updateData = {
                                 profilePictureUrl: url
-                            });
+                            }
 
                             props.updateUserDetails(auth().currentUser.uid, updateData)
                                 .then(() => {
@@ -245,7 +245,7 @@ function EditProfile(props) {
             setError3(true)
             ToastAndroid.show("Enter a correct Pincode", ToastAndroid.LONG);
         }
-        else if (name === props.user.user.name || phoneNo === props.user.user.phoneNo || gender === props.user.user.gender || dob.getDate() === new Date(props.user.user.dob).getDate() || address === props.user.user.address || landmark === props.user.user.landmark || state === props.user.user.state || city === props.user.user.city || country === props.user.user.country || pincode === props.user.user.pincode) {
+        else if (name === props.user.user.name && phoneNo === props.user.user.phoneNo && gender === props.user.user.gender && dob.getDate() === new Date(props.user.user.dob).getDate() && address === props.user.user.address && landmark === props.user.user.landmark && state === props.user.user.state && city === props.user.user.city && country === props.user.user.country && pincode === props.user.user.pincode) {
             ToastAndroid.show("No changes to update.", ToastAndroid.LONG);
             return;
         }
@@ -255,7 +255,7 @@ function EditProfile(props) {
             utility.checkNetwork()
                 .then(() => {
 
-                    const updateData = JSON.stringify({
+                    const updateData = {
                         phoneNo: phoneNo,
                         name: name,
                         gender: gender,
@@ -266,7 +266,7 @@ function EditProfile(props) {
                         city: city,
                         country: country,
                         pincode: pincode,
-                    })
+                    }
 
                     props.updateUserDetails(auth().currentUser.uid, updateData)
                         .then(() => {
@@ -474,7 +474,7 @@ function EditProfile(props) {
                         <View style={{ marginBottom: 70 }} />
                     </Animatable.View>
                 </KeyboardAwareScrollView>
-                <Button mode="contained" loading={loading} style={styles.button} color="#147EFB" onPress={() => { updateProfile() }}>Confirm update</Button>
+                <Button mode="contained" loading={loading} style={styles.button} contentStyle={{height:45}} color="#147EFB" onPress={() => { updateProfile() }}>Confirm update</Button>
 
                 {showDatePicker && (
                     <DateTimePicker
@@ -511,7 +511,7 @@ function EditProfile(props) {
                     <List.Item style={{ ...styles.item }} title="Pick Image from Gallery" left={() => <List.Icon icon="image-plus" color="#147efb" />} onPress={() => pickFromGallery()} />
                     <List.Item style={styles.item} title="Capture New Image" left={() => <List.Icon icon="camera-plus" color="#147efb" />} onPress={() => captureImage()} />
                 </List.Section>
-                <Button mode="contained" color="#147efb" onPress={() => modalizeRef.current.close()} >Cancel</Button>
+                <Button mode="contained" color="#147efb" style={{borderRadius:15}} onPress={() => modalizeRef.current.close()} >Cancel</Button>
             </Modalize>
         </>
     )
@@ -559,8 +559,9 @@ const styles = StyleSheet.create({
         bottom: 10,
         left: 20,
         right: 20,
-        height: 45,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        borderRadius:15,
+        elevation:7
     },
     radio: {
         margin: 3,

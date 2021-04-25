@@ -27,7 +27,7 @@ export const ChatHeader = ({ backAction, videoCall, title, profilePicUrl }) => {
 
 export const HomeHeader = ({ profilePic, name, onPress ,phoneNo}) => {
     return (
-        <Appbar.Header style={{ justifyContent: 'space-between', paddingHorizontal: 10 }} theme={{ colors: { primary: '#fff' } }}>
+        <Appbar.Header style={{ justifyContent: 'space-between', paddingHorizontal: 10,elevation:0 }} theme={{ colors: { primary: '#fff' } }}>
             <Avatar.Image source={require('../assets/ic_launcher_round.png')} size={35} />
             <TouchableOpacity style={{ flexDirection: "row", }} onPress={() => onPress()} >
                 <View style={{alignSelf:"center"}}>

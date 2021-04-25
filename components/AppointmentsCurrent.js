@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback,useRef} from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, Dimensions, StatusBar, BackHandler, ToastAndroid, StyleSheet, FlatList, Animated } from 'react-native';
 import { Avatar, Button, Headline, Paragraph, RadioButton, FAB, Subheading, TextInput, Title, Card, Caption } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
@@ -10,67 +10,12 @@ import * as Animatable from 'react-native-animatable';
 import moment from 'moment';
 //import Animated from 'react-native-reanimated';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import firestore from '@react-native-firebase/firestore';
+import Spinner from 'react-native-spinkit';
+import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { EventRegister } from 'react-native-event-listeners';
 
 const height = Dimensions.get('screen').height;
-
-const DATA = [
-    {
-        name: "Dr. Sandeep Jain",
-        spec: 'Cardiologist',
-        issue: "High blood pressure and headache",
-        status: "approved",
-        date: new Date()
-    },
-    {
-        name: "Dr.Shekhar Shivhare",
-        spec: 'DERMATOLOGY & VENEREOLOGY',
-        issue: "Skin problem",
-        status: "declined",
-        date: new Date("09/20/2019 02:45 PM")
-    },
-    {
-        name: "Dr. Vikram Singh Chauhan",
-        spec: 'Cardiologist',
-        issue: "High blood pressure and headache",
-        status: "completed",
-        date: new Date("11/18/2020 05:00 pm")
-    },
-    {
-        name: "Dr. Digant Pathak",
-        spec: 'GENERAL SURGERY',
-        issue: "High blood pressure and headache",
-        status: "pending",
-        date: new Date("11/25/2020 05:00 pm")
-    },
-    {
-        name: "Dr.Shekhar Shivhare",
-        spec: 'DERMATOLOGY & VENEREOLOGY',
-        issue: "Skin problem",
-        status: "completed",
-        date: new Date("09/20/2019 02:45 PM")
-    },
-    {
-        name: "Dr. Vikram Singh Chauhan",
-        spec: 'Cardiologist',
-        issue: "High blood pressure and headache",
-        status: "completed",
-        date: new Date("11/18/2020 05:00 pm")
-    },
-    {
-        name: "Dr. Vikram Singh Chauhan",
-        spec: 'Cardiologist',
-        issue: "High blood pressure and headache",
-        status: "completed",
-        date: new Date("11/18/2020 05:00 pm")
-    },
-    {
-        name: "Dr. Digant Pathak",
-        spec: 'GENERAL SURGERY',
-        issue: "High blood pressure and headache",
-        status: "pending",
-        date: new Date("11/25/2020 05:00 pm")
-    },
-]
 
 //redux
 const mapStateToProps = state => {
@@ -87,7 +32,7 @@ const mapDispatchToProps = (dispatch) => ({
 function AppointmentsCurrent(props) {
 
     //ref
-    const animatedView=useRef(0);
+    const animatedView = useRef(0);
 
     //Animated 
     const scrollY = new Animated.Value(0);
@@ -99,20 +44,69 @@ function AppointmentsCurrent(props) {
 
     //states
     const todayDate = new Date();
+    const [appointmentData, setAppointmentData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     //lifecycles
     useFocusEffect(
         useCallback(() => {
-        StatusBar.setBackgroundColor('#fff');
-    },[])
+            StatusBar.setBackgroundColor('#fff');
+        }, [])
     )
 
+    useEffect(() => {
+
+        const logout=EventRegister.addEventListener('logout',()=>{
+            unsubscribe();
+        })
+
+        const unsubscribe = firestore().collection("appointments")
+            .where('userId', '==', auth().currentUser.uid)
+            .orderBy('dateUpdated', 'desc')
+            .onSnapshot(async querySnapshot => {
+
+                const threads = await Promise.all(querySnapshot.docs.map(async documentSnapshot => {
+                    const docData = await firestore().collection("doctors").doc(documentSnapshot.data().doctorId).get();
+                    return {
+                        appointmentDocs: documentSnapshot.data().appointmentDocs,
+                        dateCreated: documentSnapshot.data().dateCreated,
+                        dateUpdated: documentSnapshot.data().dateUpdated,
+                        doctorId: docData.data(),
+                        id: documentSnapshot.data().id,
+                        prescription: documentSnapshot.data().prescription,
+                        problem: documentSnapshot.data().problem,
+                        status: documentSnapshot.data().status,
+                        time: documentSnapshot.data().time,
+                        type: documentSnapshot.data().type,
+                        userId: documentSnapshot.data().userId
+                    }
+                }));
+                setAppointmentData(threads);
+                if (loading) { setLoading(false) }
+                //console.log("Appointment Data",threads);
+            })
+
+        return () => {
+            unsubscribe();
+            EventRegister.removeEventListener(logout);
+        };
+    }, []);
+
     //methods
+
+    async function getDocData(id) {
+        await firestore().collection("doctors").doc(id).get()
+            .then(data => {
+                return data.data()
+            })
+            .catch(err => console.log(err));
+    }
+
     const CardView = ({ item, index }) => {
 
         var color;
         var time;
-        var appointmentDate = new Date(item.date);
+        var appointmentDate = new Date(item.time.toDate());
         const yesterday = new Date(Date.now() - 86400000);
         if (todayDate.getDate() === appointmentDate.getDate()) {
             var time = "Today " + moment(appointmentDate).format("hh:mm a");
@@ -142,16 +136,16 @@ function AppointmentsCurrent(props) {
 
         return (
             <Animatable.View animation="slideInUp" style={{ marginBottom: 10 }} duration={500} delay={100} useNativeDriver={true}>
-                <Card style={styles.card} onPress={() => { }}>
+                <Card style={styles.card} onPress={() => { }} >
                     <Card.Content style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
                         <View style={{ flexDirection: "row" }}>
                             <Fontisto name="doctor" size={30} style={{ margin: 5, marginRight: 10, alignSelf: "center" }} color="#147efb" />
-                            <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.name}</Title>
+                            <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.doctorId.name}</Title>
 
                         </View>
-                        <Caption style={{ marginVertical: 0, padding: 0 }}>{item.spec}</Caption>
+                        <Caption style={{ marginVertical: 0, padding: 0 }}>{"ORTHOPAEDIC"}</Caption>
                         <View style={{ width: '60%' }}>
-                            <Paragraph numberOfLines={1} style={{ overflow: "hidden", }}>{item.issue}</Paragraph>
+                            <Paragraph numberOfLines={1} style={{ overflow: "hidden", }}>{item.problem}</Paragraph>
                         </View>
                         <Subheading style={styles.date}>{time}</Subheading>
                         <View style={styles.status}>
@@ -169,29 +163,53 @@ function AppointmentsCurrent(props) {
     return (
         <View style={{ flex: 1, backgroundColor: "#fff", }}>
             <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-            <Animated.FlatList
-                data={DATA}
-                renderItem={CardView}
-                keyExtractor={(item, index) => index.toString()}
-                contentContainerStyle={{ paddingHorizontal: 15, marginTop: 10, paddingBottom: 24 }}
-                onScroll={Animated.event([
-                    {
-                        nativeEvent: { contentOffset: { y: scrollY } }
-                    }
-                ], { useNativeDriver: true })}
-                scrollEventThrottle={16}
-                alwaysBounceVertical={false}
-            />
-            <FAB
-                label="filters"
-                icon='filter-plus'
-                small={true}
-                style={{ ...styles.fab, transform: [{ translateY: FabY }] }}
-                onPress={() => console.log("Filters")}
-                color="#147efb"
-                animated={true}
 
-            />
+            {loading ?
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Spinner
+                        type="Wave"
+                        color="#147efb"
+                        isVisible={loading}
+                        size={50}
+                    />
+                </View>
+                :
+                (appointmentData.length === 0 ?
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <ComunityIcon name='calendar-alert' size={80} color="#147efb" />
+                        <Subheading style={{}}>No Current Appointments.</Subheading>
+                    </View>
+                    :
+                    <>
+                        <Animated.FlatList
+                            data={appointmentData}
+                            renderItem={CardView}
+                            keyExtractor={(item, index) => index.toString()}
+                            contentContainerStyle={{ paddingHorizontal: 15, marginTop: 10, paddingBottom: 24 }}
+                            onScroll={Animated.event([
+                                {
+                                    nativeEvent: { contentOffset: { y: scrollY } }
+                                }
+                            ], { useNativeDriver: true })}
+                            scrollEventThrottle={16}
+                            alwaysBounceVertical={false}
+                        />
+                        <FAB
+                            label="filters"
+                            icon='filter-plus'
+                            small={true}
+                            style={{ ...styles.fab, transform: [{ translateY: FabY }] }}
+                            onPress={() => console.log("Filters")}
+                            color="#147efb"
+                            animated={true}
+
+                        />
+                    </>
+                )
+            }
+
+
+
         </View>
     )
 }

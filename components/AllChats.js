@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StatusBar, BackHandler, ToastAndroid, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StatusBar, BackHandler, ToastAndroid, StyleSheet, TouchableOpacity,Keyboard } from 'react-native';
 import { Avatar, Button, Headline, Paragraph, RadioButton, Subheading, TextInput, Title, Searchbar, Badge } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 import { useBackHandler } from '@react-native-community/hooks';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect,useNavigation } from '@react-navigation/native';
 import { connect } from 'react-redux';
 import { Utility } from '../utility/utility';
 import { } from '../redux/ActionCreators';
@@ -13,6 +13,7 @@ import * as Animatable from 'react-native-animatable';
 import firestore from '@react-native-firebase/firestore';
 import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Spinner from 'react-native-spinkit';
+import { EventRegister } from 'react-native-event-listeners';
 
 const todayDate = new Date();
 
@@ -30,6 +31,7 @@ const mapDispatchToProps = (dispatch) => ({
 function AllChats(props) {
 
     //refs
+    // const navigation=useNavigation();
     const animationView = useRef(0);
 
     //states
@@ -37,6 +39,7 @@ function AllChats(props) {
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [loading, setLoading] = useState(true);
+    // const [totalUnreadChatCount, setTotalUnreadChatCount] = useState(0);
 
     //lifecycle
 
@@ -47,6 +50,10 @@ function AllChats(props) {
             animationView.current.slideInUp(500);
         }, [])
     );
+    
+    // useEffect(()=>{
+    //     navigation.setOptions({tabBarBadge:(totalUnreadChatCount===0 ? null:totalUnreadChatCount)})
+    // },[totalUnreadChatCount])
 
     useEffect(() => {
         setFilteredData(
@@ -57,6 +64,10 @@ function AllChats(props) {
     }, [search, data])
 
     useEffect(() => {
+        const logout=EventRegister.addEventListener('logout',()=>{
+            unsubscribe();
+        })
+
         const unsubscribe = firestore().collection("chatRooms")
             .where('userId', '==', auth().currentUser.uid)
             .orderBy('lastUpdatedDate', 'desc')
@@ -73,13 +84,27 @@ function AllChats(props) {
                 //console.log("Changes happened");
             })
 
-        return () => unsubscribe();
+       return () => {
+            unsubscribe();
+            EventRegister.removeEventListener(logout);
+        };
     }, []);
 
     function ListView({ item, index }) {
 
         //console.log(item);
         const unread = item.doctorMessageCount;
+        // if(unread===0){
+        //     if(totalUnreadChatCount===0){
+
+        //     }
+        //     else{
+        //         setTotalUnreadChatCount(totalUnreadChatCount-1)
+        //     }
+        // }
+        // else{
+        //     setTotalUnreadChatCount(totalUnreadChatCount+1)
+        // }
         const lable = item.doctorName.split(' ')[1][0] + item.doctorName.split(' ')[2][0]
         var time;
         var updateDate = new Date(item.lastUpdatedDate.toDate());
@@ -161,11 +186,18 @@ function AllChats(props) {
                 <Searchbar
                     placeholder="Search"
                     value={search}
-                    onChangeText={(value) => setSearch(value)}
+                    onChangeText={(value) => {
+                        setSearch(value)
+                        if(value===''){
+                            Keyboard.dismiss()
+                        }
+                    }}
                     theme={{ colors: { primary: "#147efb" } }}
                     style={{
-                        marginTop: 15
+                        marginTop: 15,
+                        borderRadius:10
                     }}
+                    iconColor="#147efb"
                 />
             </View>
 

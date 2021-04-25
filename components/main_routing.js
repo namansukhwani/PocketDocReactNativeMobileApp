@@ -29,6 +29,9 @@ import AppointmentsPrevious from './AppointmentsPrevious';
 import { HeaderTitle } from '../utility/ViewUtility';
 import VideoCall from './VideoCall';
 import * as Animatable from 'react-native-animatable';
+import NewAppointment from './NewAppointment';
+import DocDetails from './DocDetails';
+import AppointmentBooking from './AppointmentBooking';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -125,10 +128,9 @@ function BottomDrawer(props) {
             tabBarOptions={{
                 activeTintColor: '#147efb',
                 keyboardHidesTabBar: true,
-
             }}
             screenOptions={{
-                unmountOnBlur: false
+                unmountOnBlur: false,
             }}
             initialRouteName="userHome"
         >
@@ -137,7 +139,7 @@ function BottomDrawer(props) {
                 component={Home}
                 options={{
                     tabBarLabel: 'Home',
-                    tabBarIcon: ({ color, size }) => <AntIcon name="home" color={color} size={size} />
+                    tabBarIcon: ({ color, size }) => <AntIcon name="home" color={color} size={size} />,
                 }}
             />
             <Tab.Screen
@@ -162,6 +164,7 @@ function BottomDrawer(props) {
                 options={({ route, navigation }) => ({
                     tabBarLabel: 'Chats',
                     tabBarIcon: ({ color, size }) => <MaterialIcon name="chat" color={color} size={size} />,
+                    tabBarBadge: null
                 })}
             />
             <Tab.Screen
@@ -360,6 +363,65 @@ export default function Main() {
                         headerShown: false
                     })}
                     component={VideoCall}
+                />
+
+                <Stack.Screen
+                    name="NewAppointment"
+                    options={({ route, navigation }) => ({
+                        //headerShown:false,
+                        headerTitle: 'New Appointment',
+                        headerTitleAlign: 'center',
+                        headerStyle: {
+                            elevation: 0,
+                            height: 40
+                        },
+                        headerLeft: () => (
+                            <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
+                                <Icon name="chevron-back" size={30} onPress={() => navigation.goBack()} />
+                            </TouchableOpacity>
+                        ),
+                    })}
+                    component={NewAppointment}
+                />
+
+                <Stack.Screen
+                    name="DocDetails"
+                    options={({ route, navigation }) => ({
+                        //headerShown:false,
+                        headerTitle: '',
+                        headerTitleAlign: 'center',
+                        headerTransparent:true,
+                        headerStyle: {
+                            elevation: 0,
+                            height: 40,
+                            backgroundColor:'transparent'
+                        },
+                        headerLeft: () => (
+                            <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
+                                <Icon name="chevron-back" size={30} onPress={() => navigation.goBack()} />
+                            </TouchableOpacity>
+                        ),
+                    })}
+                    component={DocDetails}
+                />
+                <Stack.Screen
+                    name="AppointmentBooking"
+                    options={({ route, navigation }) => ({
+                        //headerShown:false,
+                        headerTitle: 'Appointment Booking',
+                        headerTitleAlign: 'center',
+                        headerStyle: {
+                            elevation: 0,
+                            height: 40,
+                            backgroundColor:'#fff'
+                        },
+                        headerLeft: () => (
+                            <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
+                                <Icon name="chevron-back" size={30} onPress={() => navigation.goBack()} />
+                            </TouchableOpacity>
+                        ),
+                    })}
+                    component={AppointmentBooking}
                 />
             </Stack.Navigator>
         </NavigationContainer>

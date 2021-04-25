@@ -203,7 +203,7 @@ export default function SignUp(props) {
                             error={error4}
                             textContentType="password"
                         />
-                        <Button mode="contained" loading={loading} icon="account-plus" style={{ marginTop: 35 }} color="#147EFB" onPress={() => handelSignUp()}>Register</Button>
+                        <Button mode="contained" loading={loading} icon="account-plus" style={{ marginTop: 35,borderRadius:10 }} color="#147EFB" onPress={() => handelSignUp()}>Register</Button>
                     </KeyboardAwareScrollView>
                     {/*<View style={styles.loginButton}>
                         <IconButton

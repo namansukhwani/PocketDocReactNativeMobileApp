@@ -162,7 +162,7 @@ export default function ChangePassword(props) {
                     error={error2}
                     textContentType="password"
                 />
-                <Button mode="contained" loading={loading} icon="refresh-circle" style={{ marginTop: 35 }} color="#147EFB" onPress={() => changePassword()}>Change password</Button>
+                <Button mode="contained" loading={loading} icon="refresh-circle" style={{ marginTop: 35,borderRadius:15 }} contentStyle={{height:45}} color="#147EFB" onPress={() => changePassword()}>Change password</Button>
 
             </Animatable.View>
         </View>

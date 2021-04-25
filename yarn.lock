@@ -6300,6 +6300,14 @@ react-native-push-notification@^6.1.3:
   resolved "https://registry.yarnpkg.com/react-native-push-notification/-/react-native-push-notification-6.1.3.tgz#e377e91fc931d541f23b3a156f3451bae5f441a2"
   integrity sha512-qNbFCkObCXwSFQbK6hJyx1Bym1D7V4XM8iN2L6eL3GAdNLmeBTdLdx3mPbKJtuaDJ1+deniFTQ2rz6hU4ELOXA==
 
+react-native-ratings@^8.0.3:
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-ratings/-/react-native-ratings-8.0.3.tgz#680146f5f1e136cdc9e2b40a484a4635a2e5ddff"
+  integrity sha512-4ZZYmgOCQ0LA9mp8u2rrH5wnh0woEcgsGYic5YPI9xqsmm/tcvY2Q9fvYzXstrCzaCRzvkHE20fJUHtnJfRuVA==
+  dependencies:
+    lodash "^4.17.15"
+    prop-types "^15.7.2"
+
 react-native-reanimated@^1.13.0:
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-1.13.1.tgz#c370c32cc4d447ae896cb029bb9c6a2f7608c5b4"

@@ -5,10 +5,11 @@ import auth from '@react-native-firebase/auth';
 import { connect } from 'react-redux';
 import { Utility } from '../utility/utility';
 import { } from '../redux/ActionCreators';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect,StackActions,CommonActions } from '@react-navigation/native';
 import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Animatable from 'react-native-animatable';
 import LottieView from 'lottie-react-native';
+import { EventRegister } from 'react-native-event-listeners';
 
 //redux
 const mapStateToProps = state => {
@@ -104,7 +105,7 @@ function Settings(props) {
 
                         </List.Section>
 
-                        <Button mode="contained" color="#147efb" style={{ marginTop: 15 }} onPress={() => { auth().signOut(); props.navigation.navigate("login") }} >logout</Button>
+                        <Button mode="contained" color="#147efb" style={{ marginTop: 15,borderRadius:15 }} contentStyle={{height:48}} onPress={() => {EventRegister.emit('logout');auth().signOut(); props.navigation.dispatch(StackActions.popToTop()); }} >logout</Button>
                     </View>
                 </Animatable.View>
             </ScrollView>

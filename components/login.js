@@ -286,7 +286,7 @@ function Login(props) {
                             textContentType="password"
                         />
                         <Button mode="text" style={{ width: 190, alignSelf: 'center' }} color="#147EFB" compact={true} onPress={() => props.navigation.navigate("forgotPassword", { email: email })}>Forgot Password?</Button>
-                        <Button mode="contained" loading={loading} icon="arrow-right-circle" style={{ marginTop: 35 }} color="#147EFB" onPress={() => handelLogin()}>LOGIN</Button>
+                        <Button mode="contained" loading={loading} icon="arrow-right-circle" style={{ marginTop: 35,borderRadius:10 }}  color="#147EFB" onPress={() => handelLogin()}>LOGIN</Button>
                     </KeyboardAwareScrollView>
                     {/*<View style={styles.loginButton}>
                         <IconButton
@@ -301,7 +301,7 @@ function Login(props) {
                 </Animatable.View>
                 <View style={styles.footer}>
                     <Subheading style={{ alignSelf: "center", margin: 10 }} >Don't have an account ?</Subheading>
-                    <Button mode="text" style={{ width: 90, alignSelf: "center", marginBottom: 10 }} color="#147EFB" compact={true} onPress={() => props.navigation.navigate("signUp")}>REGISTER</Button>
+                    <Button mode="text" style={{ width: 90, alignSelf: "center", marginBottom: 10}} color="#147EFB" compact={true} onPress={() => props.navigation.navigate("signUp")}>REGISTER</Button>
 
                 </View>
             </View>
