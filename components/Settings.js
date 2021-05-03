@@ -5,7 +5,7 @@ import auth from '@react-native-firebase/auth';
 import { connect } from 'react-redux';
 import { Utility } from '../utility/utility';
 import { } from '../redux/ActionCreators';
-import { useFocusEffect,StackActions,CommonActions } from '@react-navigation/native';
+import { useFocusEffect, StackActions, CommonActions } from '@react-navigation/native';
 import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Animatable from 'react-native-animatable';
 import LottieView from 'lottie-react-native';
@@ -26,20 +26,20 @@ const mapDispatchToProps = (dispatch) => ({
 function Settings(props) {
     //refs
     const animatedView = useRef(0);
-    
+
     //lifecycle
     useFocusEffect(
         useCallback(() => {
-        StatusBar.setBackgroundColor('#e3f2fd');
-        animatedView.current.slideInUp(500);
-    },[])
+            StatusBar.setBackgroundColor('#e3f2fd');
+            animatedView.current.slideInUp(500);
+        }, [])
     )
 
     return (
         <View style={{ flex: 1, backgroundColor: "#fff" }}>
             <StatusBar backgroundColor="#e3f2fd" barStyle="dark-content" translucent={false} />
             <ScrollView >
-                <Animatable.View animation="slideInUp" ref={ref => animatedView.current = ref} style={{ backgroundColor: '#e3f2fd' }} duration={500} delay={50} useNativeDriver={true}>
+                <View style={{ backgroundColor: '#e3f2fd' }}>
                     <View style={{ paddingHorizontal: 15, }}>
                         {props.user.user.profilePictureUrl === '' ?
                             <Avatar.Image style={{ elevation: 2, alignSelf: 'center', marginBottom: 15, marginTop: 10 }} size={130} source={require('../assets/user_avatar.png')} />
@@ -64,50 +64,52 @@ function Settings(props) {
                             speed={0.5}
                         />
                     </View>
+                    <Animatable.View animation="slideInUp" ref={ref => animatedView.current = ref} style={{ backgroundColor: '#e3f2fd' }} duration={500} delay={50} useNativeDriver={true}>
 
-                    <View style={{ flex: 1, padding: 15, elevation: 6, backgroundColor: '#fff', borderTopRightRadius: 30, borderTopLeftRadius: 30 }}>
-                        <List.Section>
-                            <List.Item
-                                onPress={() => { props.navigation.navigate("EditProfile") }}
-                                style={styles.listItem}
-                                title="Edit Profile"
-                                right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
-                                left={() => <List.Icon icon="account" color="#147efb" />}
-                            />
-                            <List.Item
-                                onPress={() => { props.navigation.navigate("ChangePassword") }}
-                                style={styles.listItem}
-                                title="Change Password"
-                                right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
-                                left={() => <List.Icon icon="lock-open-check" color="#147efb" />}
-                            />
-                            <List.Item
-                                onPress={() => { props.navigation.navigate("ChangeEmail") }}
-                                style={styles.listItem}
-                                title="Change Email"
-                                right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
-                                left={() => <List.Icon icon="at" color="#147efb" />}
-                            />
-                            <List.Item
-                                onPress={() => { }}
-                                style={styles.listItem}
-                                title="Medical History"
-                                right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
-                                left={() => <List.Icon icon="medical-bag" color="#147efb" />}
-                            />
-                            <List.Item
-                                onPress={() => { }}
-                                style={styles.listItem}
-                                title="Payment Options"
-                                right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
-                                left={() => <List.Icon icon="credit-card-settings-outline" color="#147efb" />}
-                            />
+                        <View style={{ flex: 1, padding: 15, elevation: 6, backgroundColor: '#fff', borderTopRightRadius: 30, borderTopLeftRadius: 30 }}>
+                            <List.Section>
+                                <List.Item
+                                    onPress={() => { props.navigation.navigate("EditProfile") }}
+                                    style={styles.listItem}
+                                    title="Edit Profile"
+                                    right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
+                                    left={() => <List.Icon icon="account" color="#147efb" />}
+                                />
+                                <List.Item
+                                    onPress={() => { props.navigation.navigate("ChangePassword") }}
+                                    style={styles.listItem}
+                                    title="Change Password"
+                                    right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
+                                    left={() => <List.Icon icon="lock-open-check" color="#147efb" />}
+                                />
+                                <List.Item
+                                    onPress={() => { props.navigation.navigate("ChangeEmail") }}
+                                    style={styles.listItem}
+                                    title="Change Email"
+                                    right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
+                                    left={() => <List.Icon icon="at" color="#147efb" />}
+                                />
+                                <List.Item
+                                    onPress={() => { }}
+                                    style={styles.listItem}
+                                    title="Medical History"
+                                    right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
+                                    left={() => <List.Icon icon="medical-bag" color="#147efb" />}
+                                />
+                                <List.Item
+                                    onPress={() => { }}
+                                    style={styles.listItem}
+                                    title="Payment Options"
+                                    right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
+                                    left={() => <List.Icon icon="credit-card-settings-outline" color="#147efb" />}
+                                />
 
-                        </List.Section>
+                            </List.Section>
 
-                        <Button mode="contained" color="#147efb" style={{ marginTop: 15,borderRadius:15 }} contentStyle={{height:48}} onPress={() => {EventRegister.emit('logout');auth().signOut(); props.navigation.dispatch(StackActions.popToTop()); }} >logout</Button>
-                    </View>
-                </Animatable.View>
+                            <Button mode="contained" color="#147efb" style={{ marginTop: 15, borderRadius: 15 }} contentStyle={{ height: 48 }} onPress={() => { EventRegister.emit('logout'); auth().signOut(); props.navigation.dispatch(StackActions.popToTop()); }} >logout</Button>
+                        </View>
+                    </Animatable.View>
+                </View>
             </ScrollView>
         </View>
     )

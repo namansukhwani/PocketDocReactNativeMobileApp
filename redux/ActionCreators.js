@@ -16,7 +16,7 @@ export const getUserDetails = (uid) => dispatch => {
                 }
                 else {
                     dispatch(userError("user does not exists"));
-                    reject({ err: response.message, status: true });
+                    reject({ err: "user does not exists", status: true });
                 }
             })
             .catch(err => {

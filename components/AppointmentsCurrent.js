@@ -72,7 +72,7 @@ function AppointmentsCurrent(props) {
                         dateCreated: documentSnapshot.data().dateCreated,
                         dateUpdated: documentSnapshot.data().dateUpdated,
                         doctorId: docData.data(),
-                        id: documentSnapshot.data().id,
+                        id: documentSnapshot.id,
                         prescription: documentSnapshot.data().prescription,
                         problem: documentSnapshot.data().problem,
                         status: documentSnapshot.data().status,

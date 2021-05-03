@@ -35,7 +35,7 @@ function NewAppointment(props) {
     const [searchData, setSearchData] = useState([]);
     const [searchFilter, setSearchFilter] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [recommendation, setrecommendation] = useState(true);
+    const [recommendation, setrecommendation] = useState(false);
 
     //lifecycles
     useEffect(() => {

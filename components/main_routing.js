@@ -32,6 +32,7 @@ import * as Animatable from 'react-native-animatable';
 import NewAppointment from './NewAppointment';
 import DocDetails from './DocDetails';
 import AppointmentBooking from './AppointmentBooking';
+import DocReviewsAll from './DocReviewsAll';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -403,6 +404,25 @@ export default function Main() {
                         ),
                     })}
                     component={DocDetails}
+                />
+                <Stack.Screen
+                    name="DocReviewsAll"
+                    options={({ route, navigation }) => ({
+                        //headerShown:false,
+                        headerTitle: 'Reviews',
+                        headerTitleAlign: 'center',
+                        headerStyle: {
+                            elevation: 0,
+                            height: 40,
+                            backgroundColor:'#fff'
+                        },
+                        headerLeft: () => (
+                            <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
+                                <Icon name="chevron-back" size={30} onPress={() => navigation.goBack()} />
+                            </TouchableOpacity>
+                        ),
+                    })}
+                    component={DocReviewsAll}
                 />
                 <Stack.Screen
                     name="AppointmentBooking"

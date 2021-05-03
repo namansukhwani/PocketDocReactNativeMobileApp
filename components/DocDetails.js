@@ -101,7 +101,7 @@ function DocDetails(props) {
 
     //methods
     const getAllReviews = () => {
-        firestore().collection('doctors').doc(data.doctorId).collection('reviews').orderBy('dateCreated','desc').limit(4).get()
+        firestore().collection('doctors').doc(data.doctorId).collection('reviews').orderBy('dateCreated','desc').limit(5).get()
             .then(reviews => {
                 const tempList = reviews.docs.map(review => {
                     return review.data()
@@ -257,11 +257,14 @@ function DocDetails(props) {
                             :
                             <View style={styles.reviewsDiv}>
                                 {reviews.map((review, index) => {
+                                    if(index===4){
+                                        return null
+                                    }
                                     return <Review data={review} index={index} key={index.toString()} totalLength={reviews.length} />
                                 })}
 
                                 {reviews.length > 4 &&
-                                    <TouchableOpacity style={styles.showMoreButton}><Paragraph style={{ color: '#147efb', fontWeight: "bold" }} >Show More</Paragraph></TouchableOpacity>
+                                    <TouchableOpacity style={styles.showMoreButton} onPress={()=>{props.navigation.navigate('DocReviewsAll', { data: data })}}><Paragraph style={{ color: '#147efb', fontWeight: "bold" }} >Show More</Paragraph></TouchableOpacity>
                                 }
                             </View>
                         }
@@ -278,6 +281,7 @@ function DocDetails(props) {
                 modalStyle={styles.modal}
                 handleStyle={{ backgroundColor: '#147efb' }}
                 rootStyle={{ elevation: 10 }}
+                onClose={()=>{setyourRating(2.5);setyourReview('')}}
             >
                 <Subheading style={{ fontWeight: "bold",color:'#f1c40f',alignSelf:"center" }}>Your Rating</Subheading>
 

@@ -350,7 +350,7 @@ function EditProfile(props) {
 
                         <Subheading style={{ marginTop: 10, fontWeight: 'bold' }}>Gender</Subheading>
                         <View style={{ flexDirection: "row" }}>
-                            <RadioButton.Group value={gender} onValueChange={(value) => setGender(value)}>
+                            <RadioButton.Group  value={gender} onValueChange={(value) => setGender(value)}>
                                 <View style={{ flexDirection: 'row' }}>
                                     <RadioButton.Item
                                         label="Male"
