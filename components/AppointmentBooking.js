@@ -132,7 +132,7 @@ function AppointmentBooking(props) {
                             }
                             <View style={{ flex: 1, display: 'flex', justifyContent: "flex-start", alignItems: 'center', flexDirection: "column", marginLeft: 5 }}>
                                 <Headline style={{ alignSelf: 'flex-start', fontWeight: "bold", paddingBottom: 0, marginBottom: 0 }}>{data.name}</Headline>
-                                <Subheading style={styles.sep}>{data.specializations[0]}</Subheading>
+                                <Subheading style={styles.sep}>{data.specializations}</Subheading>
                             </View>
                         </View>
                         
@@ -172,7 +172,7 @@ function AppointmentBooking(props) {
                         }
                         <View style={{ flex: 1, display: 'flex', justifyContent: "flex-start", alignItems: 'center', flexDirection: "column", marginLeft: 5 }}>
                             <Headline style={{ alignSelf: 'flex-start', fontWeight: "bold", paddingBottom: 0, marginBottom: 0 }}>{data.name}</Headline>
-                            <Subheading style={styles.sep}>{data.specializations[0]}</Subheading>
+                            <Subheading style={styles.sep}>{data.specializations}</Subheading>
                         </View>
                     </View>
                     <View style={styles.address}>
@@ -198,13 +198,13 @@ function AppointmentBooking(props) {
 
                     <Subheading style={{ fontWeight: "bold", marginTop: 8, marginBottom: 4 }}>Mode Of Appointment<Subheading style={{ color: 'red' }}></Subheading></Subheading>
                     <View style={{ display: 'flex', flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
-                        <TouchableOpacity style={appointmentMode === "Online" ? styles.radioModeSelected : styles.radioModeUnselected} onPress={() => { if (appointmentMode === "online") { return } setappointmentMode("online") }}>
+                        <TouchableOpacity style={appointmentMode === "online" ? styles.radioModeSelected : styles.radioModeUnselected} onPress={() => { if (appointmentMode === "online") { return } setappointmentMode("online") }}>
                             <Paragraph style={{ ...styles.radioText }}>Online</Paragraph>
-                            {appointmentMode == "Online" && <Avatar.Image style={styles.radioTick} size={25} source={require('../assets/tick.png')} />}
+                            {appointmentMode == "online" && <Avatar.Image style={styles.radioTick} size={25} source={require('../assets/tick.png')} />}
                         </TouchableOpacity>
-                        <TouchableOpacity style={appointmentMode === "Offline" ? styles.radioModeSelected : styles.radioModeUnselected} onPress={() => { if (appointmentMode === "offline") { return } setappointmentMode("offline") }}>
+                        <TouchableOpacity style={appointmentMode === "offline" ? styles.radioModeSelected : styles.radioModeUnselected} onPress={() => { if (appointmentMode === "offline") { return } setappointmentMode("offline") }}>
                             <Paragraph style={{ ...styles.radioText }}>Offline</Paragraph>
-                            {appointmentMode === "Offline" && <Avatar.Image style={styles.radioTick} size={25} source={require('../assets/tick.png')} />}
+                            {appointmentMode === "offline" && <Avatar.Image style={styles.radioTick} size={25} source={require('../assets/tick.png')} />}
                         </TouchableOpacity>
                     </View>
                     <Subheading style={{ fontWeight: "bold", marginTop: 8, marginBottom: 4 }}>Your Problem in Brief<Subheading style={{ color: 'red' }}>*</Subheading><Caption>{"  " + yourProblem.length + "/240"}</Caption></Subheading>
