@@ -78,9 +78,9 @@ function SetProfilePic(props) {
                         .then(url => {
                             setProfilePicUrl(url);
 
-                            const updateData = JSON.stringify({
+                            const updateData = {
                                 profilePictureUrl: url
-                            });
+                            }
 
                             props.updateUserDetails(auth().currentUser.uid, updateData)
                                 .then(() => {

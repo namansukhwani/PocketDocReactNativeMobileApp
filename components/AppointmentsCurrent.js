@@ -143,7 +143,7 @@ function AppointmentsCurrent(props) {
                             <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.doctorId.name}</Title>
 
                         </View>
-                        <Caption style={{ marginVertical: 0, padding: 0 }}>{"ORTHOPAEDIC"}</Caption>
+                        <Caption style={{ marginVertical: 0, padding: 0,textTransform:"capitalize"}}>{item.doctorId.specializations}</Caption>
                         <View style={{ width: '60%' }}>
                             <Paragraph numberOfLines={1} style={{ overflow: "hidden", }}>{item.problem}</Paragraph>
                         </View>

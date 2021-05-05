@@ -35,7 +35,7 @@ function NewAppointment(props) {
     const [searchData, setSearchData] = useState([]);
     const [searchFilter, setSearchFilter] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [recommendation, setrecommendation] = useState(false);
+    const [recommendation, setrecommendation] = useState(true);
 
     //lifecycles
     useEffect(() => {
@@ -81,7 +81,7 @@ function NewAppointment(props) {
                     }
                     <View style={{ marginLeft: 10, flex: 1 }}>
                         <Title style={{ marginBottom: 0 }}>{item.name}</Title>
-                        <Text style={styles.time}>{"ORTOPADIC"}</Text>
+                        <Text style={styles.time}>{item.specializations}</Text>
                         <View style={{ justifyContent: "flex-start", alignItems: "center", display: "flex", flexDirection: "row" }}>
                             <MaterialIcon name="location-on" size={15} />
                             <Paragraph numberOfLines={1} style={{ overflow: 'hidden', fontSize: 13 }}>{address}</Paragraph>
@@ -117,7 +117,7 @@ function NewAppointment(props) {
                             <Paragraph style={{ overflow: "hidden", justifyContent: "center",width:'90%', alignItems: "center", display: "flex" }} numberOfLines={1}>{address}</Paragraph>
                         </View>
 
-                        <Text style={{ ...styles.spe, backgroundColor: "#e3f2fd", marginTop: 5,}}>{'ORTOPeADIst'}</Text>
+                        <Text style={{ ...styles.spe, backgroundColor: "#e3f2fd", marginTop: 5,}}>{item.specializations}</Text>
                     </View>
                 </TouchableOpacity>
             </Animatable.View>
@@ -140,15 +140,15 @@ function NewAppointment(props) {
                             <Image source={{ uri: item.profilePictureUrl }} style={styles.avatar} resizeMode='cover' />
                         }
                         <View style={{ flex: 1, paddingRight: 10, padding: 5 }}>
-                            <Title style={{ marginVertical: 0, paddingVertical: 0 }}>Dr. Naman Sukhwani</Title>
+                            <Title style={{ marginVertical: 0, paddingVertical: 0 }}>{item.name}</Title>
                             <View style={{ justifyContent: "flex-start", alignItems: "center", display: "flex", flexDirection: "row" }}>
-                                <MaterialIcon name="location-on" size={16} />
-                                <Paragraph style={{ overflow: "hidden", marginVertical: 0,width:'90%'}} numberOfLines={1}>{address}</Paragraph>
+                                <MaterialIcon name="location-on" size={20} />
+                                <Paragraph style={{ overflow: "hidden", marginVertical: 0,width:'90%'}} numberOfLines={2}>{address}</Paragraph>
                             </View>
                         </View>
                     </View>
                     <View style={{ justifyContent: "center", paddingHorizontal: 8, paddingVertical: 8 }}>
-                        <Text style={styles.spe}>{'ORTOPeADIst'}</Text>
+                        <Text style={styles.spe}>{item.specializations}</Text>
                     </View>
                     <View style={styles.rightArrow}>
                         <IconicsIcon name="ios-arrow-forward-circle-sharp" size={40}/>
@@ -181,7 +181,7 @@ function NewAppointment(props) {
                     <View style={styles.searchResults}>
                         {searchFilter.length === 0 ?
                             <View>
-                                <Paragraph style={{ alignSelf: 'center' }}>No Search result Available</Paragraph>
+                                <Paragraph style={{ alignSelf: 'center', }}>No Search result Available</Paragraph>
                             </View>
                             :
                             <View>
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff95',
         alignSelf: 'flex-start',
         justifyContent: 'center',
-        textTransform:'uppercase'
+        textTransform:'capitalize'
     },
     rightArrow:{
         position:"absolute",

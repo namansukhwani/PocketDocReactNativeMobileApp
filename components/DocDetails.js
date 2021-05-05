@@ -193,7 +193,7 @@ function DocDetails(props) {
                             <Avatar.Image style={{ elevation: 2, alignSelf: 'flex-start', marginBottom: 5, marginTop: 0 }} size={180} source={{ uri: data.profilePictureUrl }} />
                         }
                         <Headline style={{ alignSelf: 'flex-start', fontWeight: "bold", paddingBottom: 0, marginBottom: 0, marginLeft: 5 }}>{data.name}</Headline>
-                        <Subheading style={styles.sep}>{data.specializations[0]}</Subheading>
+                        <Subheading style={styles.sep}>{data.specializations}</Subheading>
                         <View style={styles.address}>
                             <MaterialIcon name="location-on" size={20} color="#757575" />
                             <Paragraph style={{ color: '#757575' }} >{address}</Paragraph>

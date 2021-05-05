@@ -60,11 +60,11 @@ export default function SignUp(props) {
         utility.checkNetwork()
             .then(() => {
                 auth()
-                    .createUserWithEmailAndPassword(email, password)
+                    .createUserWithEmailAndPassword(email.trim(), password)
                     .then((user) => {
 
                         user.user.updateProfile({
-                            displayName: name,
+                            displayName: name.trim(),
                             photoURL: "user"
                         })
                             .then(user => {
@@ -106,7 +106,7 @@ export default function SignUp(props) {
         const userProfile = {
             login: userId,
             password: "123456789",
-            full_name: name,
+            full_name: name.trim(),
         };
         ConnectyCube.createSession()
             .then(session => {

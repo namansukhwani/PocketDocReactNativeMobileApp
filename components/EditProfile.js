@@ -256,16 +256,16 @@ function EditProfile(props) {
                 .then(() => {
 
                     const updateData = {
-                        phoneNo: phoneNo,
-                        name: name,
-                        gender: gender,
+                        phoneNo: phoneNo.trim(),
+                        name: name.trim(),
+                        gender: gender.trim(),
                         dob: dob.toISOString(),
-                        address: address,
-                        landmark: landmark,
-                        state: state,
-                        city: city,
-                        country: country,
-                        pincode: pincode,
+                        address: address.trim(),
+                        landmark: landmark.trim(),
+                        state: state.trim(),
+                        city: city.trim(),
+                        country: country.trim(),
+                        pincode: pincode.trim(),
                     }
 
                     props.updateUserDetails(auth().currentUser.uid, updateData)
