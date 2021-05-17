@@ -144,7 +144,9 @@ function EditProfile(props) {
             .then(image => {
                 let filename = image.path.substring(image.path.lastIndexOf('/') + 1, image.path.length);
                 uploadImage(image.path.slice(7), filename);
-                console.log("path:: ", image.path.slice(7));
+                // console.log("path:: ", image.path.slice(7));
+                // console.log("path:: ", image.path);
+
             })
             .catch(err => {
                 console.log(err);
@@ -350,7 +352,7 @@ function EditProfile(props) {
 
                         <Subheading style={{ marginTop: 10, fontWeight: 'bold' }}>Gender</Subheading>
                         <View style={{ flexDirection: "row" }}>
-                            <RadioButton.Group  value={gender} onValueChange={(value) => setGender(value)}>
+                            <RadioButton.Group value={gender} onValueChange={(value) => setGender(value)}>
                                 <View style={{ flexDirection: 'row' }}>
                                     <RadioButton.Item
                                         label="Male"
@@ -474,7 +476,7 @@ function EditProfile(props) {
                         <View style={{ marginBottom: 70 }} />
                     </Animatable.View>
                 </KeyboardAwareScrollView>
-                <Button mode="contained" loading={loading} style={styles.button} contentStyle={{height:45}} color="#147EFB" onPress={() => { updateProfile() }}>Confirm update</Button>
+                <Button mode="contained" loading={loading} style={styles.button} contentStyle={{ height: 45 }} color="#147EFB" onPress={() => { updateProfile() }}>Confirm update</Button>
 
                 {showDatePicker && (
                     <DateTimePicker
@@ -511,7 +513,7 @@ function EditProfile(props) {
                     <List.Item style={{ ...styles.item }} title="Pick Image from Gallery" left={() => <List.Icon icon="image-plus" color="#147efb" />} onPress={() => pickFromGallery()} />
                     <List.Item style={styles.item} title="Capture New Image" left={() => <List.Icon icon="camera-plus" color="#147efb" />} onPress={() => captureImage()} />
                 </List.Section>
-                <Button mode="contained" color="#147efb" style={{borderRadius:15}} onPress={() => modalizeRef.current.close()} >Cancel</Button>
+                <Button mode="contained" color="#147efb" style={{ borderRadius: 15 }} onPress={() => modalizeRef.current.close()} >Cancel</Button>
             </Modalize>
         </>
     )
@@ -560,8 +562,8 @@ const styles = StyleSheet.create({
         left: 20,
         right: 20,
         justifyContent: 'center',
-        borderRadius:15,
-        elevation:7
+        borderRadius: 15,
+        elevation: 7
     },
     radio: {
         margin: 3,

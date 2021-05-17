@@ -114,10 +114,10 @@ function NewAppointment(props) {
                     <View style={{ justifyContent: "center", paddingHorizontal: 8, paddingVertical: 8 }}>
                         <View style={{ justifyContent: "flex-start", alignItems: "center", display: "flex", flexDirection: "row" }}>
                             <MaterialIcon name="location-on" size={16} />
-                            <Paragraph style={{ overflow: "hidden", justifyContent: "center",width:'90%', alignItems: "center", display: "flex" }} numberOfLines={1}>{address}</Paragraph>
+                            <Paragraph style={{ overflow: "hidden", justifyContent: "center", width: '90%', alignItems: "center", display: "flex" }} numberOfLines={1}>{address}</Paragraph>
                         </View>
 
-                        <Text style={{ ...styles.spe, backgroundColor: "#e3f2fd", marginTop: 5,}}>{item.specializations}</Text>
+                        <Text style={{ ...styles.spe, backgroundColor: "#e3f2fd", marginTop: 5, }}>{item.specializations}</Text>
                     </View>
                 </TouchableOpacity>
             </Animatable.View>
@@ -143,7 +143,7 @@ function NewAppointment(props) {
                             <Title style={{ marginVertical: 0, paddingVertical: 0 }}>{item.name}</Title>
                             <View style={{ justifyContent: "flex-start", alignItems: "center", display: "flex", flexDirection: "row" }}>
                                 <MaterialIcon name="location-on" size={20} />
-                                <Paragraph style={{ overflow: "hidden", marginVertical: 0,width:'90%'}} numberOfLines={2}>{address}</Paragraph>
+                                <Paragraph style={{ overflow: "hidden", marginVertical: 0, width: '90%' }} numberOfLines={2}>{address}</Paragraph>
                             </View>
                         </View>
                     </View>
@@ -151,7 +151,7 @@ function NewAppointment(props) {
                         <Text style={styles.spe}>{item.specializations}</Text>
                     </View>
                     <View style={styles.rightArrow}>
-                        <IconicsIcon name="ios-arrow-forward-circle-sharp" size={40}/>
+                        <IconicsIcon name="ios-arrow-forward-circle-sharp" size={40} />
                     </View>
                 </TouchableOpacity>
             </Animatable.View>
@@ -213,7 +213,7 @@ function NewAppointment(props) {
                             <>
                                 <Title style={{ fontSize: 18, marginLeft: 15, marginTop: 10 }}>Recommended Doctors</Title>
                                 <FlatList
-                                    data={searchData}
+                                    data={searchData.length > 4 ? searchData.slice(0, 4) : searchData}
                                     renderItem={RecommendedView}
                                     keyExtractor={(item, index) => index.toString()}
                                     horizontal={true}
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
         elevation: 5,
         borderRadius: 10,
         marginBottom: 10,
-        overflow:'hidden'
+        overflow: 'hidden'
     },
     avatar: {
         alignSelf: 'flex-start',
@@ -285,12 +285,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff95',
         alignSelf: 'flex-start',
         justifyContent: 'center',
-        textTransform:'capitalize'
+        textTransform: 'capitalize'
     },
-    rightArrow:{
-        position:"absolute",
-        right:0,
-        bottom:0,
+    rightArrow: {
+        position: "absolute",
+        right: 0,
+        bottom: 0,
         // backgroundColor:"#f9f9f9",
         paddingHorizontal: 10,
         height: 50,

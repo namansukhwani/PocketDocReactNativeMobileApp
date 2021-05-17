@@ -40,45 +40,45 @@ function AppointmentBooking(props) {
     //methods
 
     const bookAppointment = () => {
-        if(data.schedule.days.includes(appointmentDate.getDay())){
-            if(yourProblem.length===0 || yourProblem.length>240){
+        if (data.schedule.days.includes(appointmentDate.getDay())) {
+            if (yourProblem.length === 0 || yourProblem.length > 240) {
                 setyourProblemError(true)
                 return;
             }
 
             setinBooking(true)
 
-            const appointmentData={
-                dateCreated:firestore.Timestamp.now(),
-                dateUpdated:firestore.Timestamp.now(),
-                doctorId:data.doctorId,
-                appointmentDocs:[],
-                prescription:[],
-                problem:yourProblem,
-                status:'pending',
-                time:firestore.Timestamp.fromDate(new Date(`${appointmentDate.toLocaleDateString()} ${data.schedule.slots[selectedTimeSlot].start.toDate().toLocaleTimeString()}`)),
-                type:appointmentMode,
-                userId:auth().currentUser.uid
+            const appointmentData = {
+                dateCreated: firestore.Timestamp.now(),
+                dateUpdated: firestore.Timestamp.now(),
+                doctorId: data.doctorId,
+                appointmentDocs: [],
+                prescription: [],
+                problem: yourProblem,
+                status: 'pending',
+                time: firestore.Timestamp.fromDate(new Date(`${appointmentDate.toLocaleDateString()} ${data.schedule.slots[selectedTimeSlot].start.toDate().toLocaleTimeString()}`)),
+                type: appointmentMode,
+                userId: auth().currentUser.uid
             }
 
             firestore().collection('appointments').add(appointmentData)
-            .then(value=>{
-                setbookedAppointmentId(value.id);
+                .then(value => {
+                    setbookedAppointmentId(value.id);
 
-                setinBooking(false);
-                setbooked(true);
-            })
-            .catch(err=>{
-                console.log(err);
-                setinBooking(false)
-                ToastAndroid.show("Unable to book appointment at the moment due to some err");
-            })
+                    setinBooking(false);
+                    setbooked(true);
+                })
+                .catch(err => {
+                    console.log(err);
+                    setinBooking(false)
+                    ToastAndroid.show("Unable to book appointment at the moment due to some err");
+                })
 
         }
-        else{
-            ToastAndroid.show(`${data.name} is not available on ${allDays[appointmentDate.getDay()]}. See available days for booking.`,ToastAndroid.LONG)
+        else {
+            ToastAndroid.show(`${data.name} is not available on ${allDays[appointmentDate.getDay()]}. See available days for booking.`, ToastAndroid.LONG)
         }
-        
+
     }
 
     const fetchSlotsForDate = () => {
@@ -135,7 +135,7 @@ function AppointmentBooking(props) {
                                 <Subheading style={styles.sep}>{data.specializations}</Subheading>
                             </View>
                         </View>
-                        
+
                         <Subheading style={{ fontWeight: "bold", marginTop: 8, marginBottom: 4 }}>Appointment ID</Subheading>
                         <View style={styles.textBox}><Paragraph style={{ color: '#757575', fontWeight: 'bold' }}>{bookedAppointmentId}</Paragraph></View>
 
@@ -148,7 +148,7 @@ function AppointmentBooking(props) {
                         <Subheading style={{ fontWeight: "bold", marginTop: 8, marginBottom: 4 }}>Date</Subheading>
                         <View style={styles.textBox}><Paragraph style={{ color: '#757575', fontWeight: 'bold' }}>{moment(appointmentDate).format('Do MMMM YYYY')}</Paragraph></View>
                         <Subheading style={{ fontWeight: "bold", marginTop: 8, marginBottom: 4 }}>Time</Subheading>
-                        <View style={styles.textBox}><Paragraph style={{ color: '#757575', fontWeight: 'bold' }}>{moment(data.schedule.slots[selectedTimeSlot].start.toDate()).format('hh:mm a')+" - "+moment(data.schedule.slots[selectedTimeSlot].end.toDate()).format('hh:mm a')}</Paragraph></View>
+                        <View style={styles.textBox}><Paragraph style={{ color: '#757575', fontWeight: 'bold' }}>{moment(data.schedule.slots[selectedTimeSlot].start.toDate()).format('hh:mm a') + " - " + moment(data.schedule.slots[selectedTimeSlot].end.toDate()).format('hh:mm a')}</Paragraph></View>
                         <Subheading style={{ fontWeight: "bold", marginTop: 8, marginBottom: 4 }}>Mode</Subheading>
                         <View style={styles.textBox}><Paragraph style={{ color: '#757575', fontWeight: 'bold' }}>{appointmentMode}</Paragraph></View>
                         <Subheading style={{ fontWeight: "bold", marginTop: 8, marginBottom: 4 }}>Issue</Subheading>
@@ -194,16 +194,18 @@ function AppointmentBooking(props) {
                             )
                         })}
                     </View>
-                    <Button mode='outlined' style={{ justifyContent: 'center', borderRadius: 15, marginTop: 10 }} labelStyle={{ color: '#147efb' }} contentStyle={{ height: 45 }} color="#000" onPress={() => { setisSlotModalOpen(true) }}>{moment(data.schedule.slots[selectedTimeSlot].start.toDate()).format('hh:mm a')+" - "+moment(data.schedule.slots[selectedTimeSlot].end.toDate()).format('hh:mm a')}</Button>
+                    <Button mode='outlined' style={{ justifyContent: 'center', borderRadius: 15, marginTop: 10 }} labelStyle={{ color: '#147efb' }} contentStyle={{ height: 45 }} color="#000" onPress={() => { setisSlotModalOpen(true) }}>{moment(data.schedule.slots[selectedTimeSlot].start.toDate()).format('hh:mm a') + " - " + moment(data.schedule.slots[selectedTimeSlot].end.toDate()).format('hh:mm a')}</Button>
 
                     <Subheading style={{ fontWeight: "bold", marginTop: 8, marginBottom: 4 }}>Mode Of Appointment<Subheading style={{ color: 'red' }}></Subheading></Subheading>
                     <View style={{ display: 'flex', flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
                         <TouchableOpacity style={appointmentMode === "online" ? styles.radioModeSelected : styles.radioModeUnselected} onPress={() => { if (appointmentMode === "online") { return } setappointmentMode("online") }}>
                             <Paragraph style={{ ...styles.radioText }}>Online</Paragraph>
+                            <Paragraph style={{ fontWeight: 'bold', color: '#147efb', marginBottom: 17 }}>{"₹" + data.fee.online}</Paragraph>
                             {appointmentMode == "online" && <Avatar.Image style={styles.radioTick} size={25} source={require('../assets/tick.png')} />}
                         </TouchableOpacity>
                         <TouchableOpacity style={appointmentMode === "offline" ? styles.radioModeSelected : styles.radioModeUnselected} onPress={() => { if (appointmentMode === "offline") { return } setappointmentMode("offline") }}>
                             <Paragraph style={{ ...styles.radioText }}>Offline</Paragraph>
+                            <Paragraph style={{ fontWeight: 'bold', color: '#147efb', marginBottom: 17 }}>{"₹" + data.fee.offline}</Paragraph>
                             {appointmentMode === "offline" && <Avatar.Image style={styles.radioTick} size={25} source={require('../assets/tick.png')} />}
                         </TouchableOpacity>
                     </View>
@@ -229,8 +231,8 @@ function AppointmentBooking(props) {
                                 setyourProblemError(true)
                             }
                         }}
-                        onBlur={()=>{
-                            if(yourProblem.length===0){
+                        onBlur={() => {
+                            if (yourProblem.length === 0) {
                                 setyourProblemError(true)
                             }
                         }}
@@ -277,11 +279,11 @@ function AppointmentBooking(props) {
                         {data.schedule.slots.map((slot, index) => {
                             return (
                                 <RadioButton.Item
-                                    label={moment(slot.start.toDate()).format('hh:mm a')+" - "+moment(slot.end.toDate()).format('hh:mm a')}
+                                    label={moment(slot.start.toDate()).format('hh:mm a') + " - " + moment(slot.end.toDate()).format('hh:mm a')}
                                     value={index.toString()}
                                     labelStyle={{ color: '#147efb', fontWeight: 'bold' }}
                                     uncheckedColor="#147efb"
-                                    style={{ ...styles.slotAvailable, ...(selectedTimeSlot === index? { borderWidth: 1 } : { borderWidth: 0 }) }}
+                                    style={{ ...styles.slotAvailable, ...(selectedTimeSlot === index ? { borderWidth: 1 } : { borderWidth: 0 }) }}
                                     mode="ios"
                                     key={index}
                                 />
@@ -309,7 +311,7 @@ function AppointmentBooking(props) {
                 </ScrollView>
                 <View style={{ marginTop: 10, display: "flex", justifyContent: 'flex-end', alignItems: "center", flexDirection: 'row' }}>
                     <Button style={{ marginRight: 5 }} onPress={() => setisSlotModalOpen(false)} theme={{ colors: { primary: '#147efb' } }}>CANCEL</Button>
-                    <Button onPress={() => {setisSlotModalOpen(false) }} theme={{ colors: { primary: '#147efb' } }}>OK</Button>
+                    <Button onPress={() => { setisSlotModalOpen(false) }} theme={{ colors: { primary: '#147efb' } }}>OK</Button>
                 </View>
             </Modal>
         </View>
@@ -385,7 +387,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     radioText: {
-        marginVertical: 17,
+        marginTop: 17,
         fontSize: 18,
         textTransform: 'uppercase',
         fontWeight: 'bold',

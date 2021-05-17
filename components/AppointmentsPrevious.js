@@ -9,72 +9,17 @@ import { useFocusEffect } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import moment from 'moment';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import Spinner from 'react-native-spinkit';
+import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const height = Dimensions.get('screen').height;
-
-const DATA = [
-    {
-        name: "Dr. Sandeep Jain",
-        spec: 'Cardiologist',
-        issue: "High blood pressure and headache",
-        status: "approved",
-        date: new Date()
-    },
-    {
-        name: "Dr.Shekhar Shivhare",
-        spec: 'DERMATOLOGY & VENEREOLOGY',
-        issue: "Skin problem",
-        status: "declined",
-        date: new Date("09/20/2019 02:45 PM")
-    },
-    {
-        name: "Dr. Vikram Singh Chauhan",
-        spec: 'Cardiologist',
-        issue: "High blood pressure and headache",
-        status: "completed",
-        date: new Date("11/18/2020 05:00 pm")
-    },
-    {
-        name: "Dr. Digant Pathak",
-        spec: 'GENERAL SURGERY',
-        issue: "High blood pressure and headache",
-        status: "pending",
-        date: new Date("11/25/2020 05:00 pm")
-    },
-    {
-        name: "Dr.Shekhar Shivhare",
-        spec: 'DERMATOLOGY & VENEREOLOGY',
-        issue: "Skin problem",
-        status: "completed",
-        date: new Date("09/20/2019 02:45 PM")
-    },
-    {
-        name: "Dr. Vikram Singh Chauhan",
-        spec: 'Cardiologist',
-        issue: "High blood pressure and headache",
-        status: "completed",
-        date: new Date("11/18/2020 05:00 pm")
-    },
-    {
-        name: "Dr. Vikram Singh Chauhan",
-        spec: 'Cardiologist',
-        issue: "High blood pressure and headache",
-        status: "completed",
-        date: new Date("11/18/2020 05:00 pm")
-    },
-    {
-        name: "Dr. Digant Pathak",
-        spec: 'GENERAL SURGERY',
-        issue: "High blood pressure and headache",
-        status: "pending",
-        date: new Date("11/25/2020 05:00 pm")
-    },
-]
+const todayDate = new Date();
 
 //redux
 const mapStateToProps = state => {
     return {
-        user: state.user
+        user: state.user,
+        appointments: state.appointmentesPrevious,
     };
 };
 
@@ -93,13 +38,15 @@ function AppointmentsPrevious(props) {
     })
 
     //states
-    const todayDate = new Date();
 
     //lifecycles
+
     useFocusEffect(
         useCallback(() => {
-        StatusBar.setBackgroundColor('#fff');
-    },[])
+            // console.log(props.appointments.appointments);
+
+            StatusBar.setBackgroundColor('#fff');
+        }, [])
     )
 
     //methods
@@ -107,7 +54,7 @@ function AppointmentsPrevious(props) {
 
         var color;
         var time;
-        var appointmentDate = new Date(item.date);
+        var appointmentDate = new Date(item.time.toDate());
         const yesterday = new Date(Date.now() - 86400000);
         if (todayDate.getDate() === appointmentDate.getDate()) {
             var time = "Today " + moment(appointmentDate).format("hh:mm a");
@@ -136,17 +83,17 @@ function AppointmentsPrevious(props) {
         }
 
         return (
-            <Animatable.View animation="slideInUp" style={{ marginBottom: 10 }} duration={500} delay={50} useNativeDriver={true}>
-                <Card style={styles.card} onPress={() => { console.log("hello"); }}>
+            <Animatable.View key={index.toString()} animation="slideInUp" style={{ marginBottom: 10 }} duration={500} delay={100} useNativeDriver={true}>
+                <Card style={styles.card} onPress={() => { props.navigation.navigate('AppointmentDetails', { data: item }) }} >
                     <Card.Content style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
                         <View style={{ flexDirection: "row" }}>
                             <Fontisto name="doctor" size={30} style={{ margin: 5, marginRight: 10, alignSelf: "center" }} color="#147efb" />
-                            <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.name}</Title>
+                            <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.doctorData.name}</Title>
 
                         </View>
-                        <Caption style={{ marginVertical: 0, padding: 0 }}>{item.spec}</Caption>
+                        <Caption style={{ marginVertical: 0, padding: 0, textTransform: "capitalize" }}>{item.doctorId.specializations}</Caption>
                         <View style={{ width: '60%' }}>
-                            <Paragraph numberOfLines={1} style={{ overflow: "hidden", }}>{item.issue}</Paragraph>
+                            <Paragraph numberOfLines={1} style={{ overflow: "hidden", }}>{item.problem}</Paragraph>
                         </View>
                         <Subheading style={styles.date}>{time}</Subheading>
                         <View style={styles.status}>
@@ -164,28 +111,49 @@ function AppointmentsPrevious(props) {
     return (
         <View style={{ flex: 1, backgroundColor: "#fff", }}>
             <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-            <Animated.FlatList
-                data={DATA}
-                renderItem={CardView}
-                keyExtractor={(item, index) => index.toString()}
-                contentContainerStyle={{ paddingHorizontal: 15, marginTop: 10, paddingBottom: 24 }}
-                onScroll={Animated.event([
-                    {
-                        nativeEvent: { contentOffset: { y: scrollY } }
-                    }
-                ], { useNativeDriver: true })}
-                scrollEventThrottle={16}
-                alwaysBounceVertical={false}
-            />
-            <FAB
-                label="filters"
-                icon='filter-plus'
-                small={true}
-                style={{ ...styles.fab, transform: [{ translateY: FabY }] }}
-                onPress={() => console.log("Filters")}
-                color="#147efb"
-                animated={true}
-            />
+            {props.appointments.isLoading ?
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Spinner
+                        type="Wave"
+                        color="#147efb"
+                        isVisible={true}
+                        size={50}
+                    />
+                </View>
+                :
+                (props.appointments.appointments.length === 0 ?
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <ComunityIcon name='calendar-alert' size={80} color="#147efb" />
+                        <Subheading style={{}}>No Previous Appointments.</Subheading>
+                    </View>
+                    :
+                    <>
+                        <Animated.FlatList
+                            data={props.appointments.appointments}
+                            renderItem={CardView}
+                            keyExtractor={(item, index) => index.toString()}
+                            contentContainerStyle={{ paddingHorizontal: 15, marginTop: 10, paddingBottom: 24 }}
+                            onScroll={Animated.event([
+                                {
+                                    nativeEvent: { contentOffset: { y: scrollY } }
+                                }
+                            ], { useNativeDriver: true })}
+                            scrollEventThrottle={16}
+                            alwaysBounceVertical={false}
+                        />
+                        <FAB
+                            label="filters"
+                            icon='filter-plus'
+                            small={true}
+                            style={{ ...styles.fab, transform: [{ translateY: FabY }] }}
+                            onPress={() => console.log("Filters")}
+                            color="#147efb"
+                            animated={true}
+
+                        />
+                    </>
+                )
+            }
         </View>
     )
 }

@@ -101,7 +101,7 @@ function DocDetails(props) {
 
     //methods
     const getAllReviews = () => {
-        firestore().collection('doctors').doc(data.doctorId).collection('reviews').orderBy('dateCreated','desc').limit(5).get()
+        firestore().collection('doctors').doc(data.doctorId).collection('reviews').orderBy('dateCreated', 'desc').limit(5).get()
             .then(reviews => {
                 const tempList = reviews.docs.map(review => {
                     return review.data()
@@ -115,68 +115,68 @@ function DocDetails(props) {
             })
     }
 
-    const postReview=()=>{
-        if(yourReview.length<=0){
-            ToastAndroid.show("Can\'t post review without a comment",ToastAndroid.LONG)
+    const postReview = () => {
+        if (yourReview.length <= 0) {
+            ToastAndroid.show("Can\'t post review without a comment", ToastAndroid.LONG)
         }
-        else{
-            const reviewData={
-                userId:auth().currentUser.uid,
-                dateCreated:firestore.Timestamp.now(),
-                rating:yourRating,
-                comment:yourReview
+        else {
+            const reviewData = {
+                userId: auth().currentUser.uid,
+                dateCreated: firestore.Timestamp.now(),
+                rating: yourRating,
+                comment: yourReview
             }
 
             firestore().collection('doctors').doc(data.doctorId).collection('reviews').add(reviewData)
-            .then(()=>{
-                getAllReviews()
-                const ratingUpdateData={
-                    rating:{
-                        totalRating:data.rating.totalRating+yourRating,
-                        noOfRatings:data.rating.noOfRatings+1
+                .then(() => {
+                    getAllReviews()
+                    const ratingUpdateData = {
+                        rating: {
+                            totalRating: data.rating.totalRating + yourRating,
+                            noOfRatings: data.rating.noOfRatings + 1
+                        }
                     }
-                }
 
-                firestore().collection('doctors').doc(data.doctorId).update(ratingUpdateData)
-                .then(()=>{
-                    ToastAndroid.show("Review Posted Sucessfully",ToastAndroid.SHORT)
+                    firestore().collection('doctors').doc(data.doctorId).update(ratingUpdateData)
+                        .then(() => {
+                            ToastAndroid.show("Review Posted Sucessfully", ToastAndroid.SHORT)
+                            giveReviewModal.current.close()
+                        })
+                        .catch((err) => {
+                            ToastAndroid.show('Review posted but unable to update rating', ToastAndroid.SHORT)
+                            giveReviewModal.current.close()
+
+                        })
+                })
+                .catch(err => {
+                    console.log(err);
+                    ToastAndroid.show("Unable to post review at the moment please try again later", ToastAndroid.LONG)
                     giveReviewModal.current.close()
                 })
-                .catch((err)=>{
-                    ToastAndroid.show('Review posted but unable to update rating',ToastAndroid.SHORT)
-                    giveReviewModal.current.close()
-
-                })
-            })
-            .catch(err=>{
-                console.log(err);
-                ToastAndroid.show("Unable to post review at the moment please try again later",ToastAndroid.LONG)
-                giveReviewModal.current.close()
-            })
 
         }
     }
 
-    const colorForExperience=(exp)=>{
-        if(exp<5){
+    const colorForExperience = (exp) => {
+        if (exp < 5) {
             return colours[0]
         }
-        else if(exp>=5 && exp<10){
+        else if (exp >= 5 && exp < 10) {
             return colours[1]
         }
-        else{
+        else {
             return colours[2]
         }
     }
 
-    const colorForRating=(rat)=>{
-        if(rat<2){
+    const colorForRating = (rat) => {
+        if (rat < 2) {
             return colours[0]
         }
-        else if(rat>=2 && rat<3.5){
+        else if (rat >= 2 && rat < 3.5) {
             return colours[1]
         }
-        else{
+        else {
             return colours[2]
         }
     }
@@ -212,7 +212,7 @@ function DocDetails(props) {
                         <Subheading style={{ fontSize: 20, fontWeight: "bold", marginTop: 0, paddingTop: 0 }}>About</Subheading>
                         <Paragraph style={{ fontSize: 14.7 }}>{data.about}</Paragraph>
                         <View style={styles.ratingView}>
-                            <View style={{ ...styles.ratingViewButton, marginRight: 6 ,backgroundColor:colorForExperience(data.exprience).backgroundColor}}>
+                            <View style={{ ...styles.ratingViewButton, marginRight: 6, backgroundColor: colorForExperience(data.exprience).backgroundColor }}>
                                 <Headline style={{ color: colorForExperience(data.exprience).text }}>{data.exprience + "+"}</Headline>
                                 <Subheading style={{ fontWeight: 'bold' }} >Exp. Years</Subheading>
                             </View>
@@ -250,6 +250,21 @@ function DocDetails(props) {
                                 left={() => <List.Icon icon="directions" color="#147efb" />}
                             />
                         </List.Section>
+                        <Subheading style={{ fontSize: 20, fontWeight: "bold", marginTop: 0, paddingTop: 0 }}>Fee details</Subheading>
+                        <View style={styles.ratingView}>
+                            <View style={{ ...styles.ratingViewButton, marginRight: 6, backgroundColor: "#e3f2fd" }}>
+                                <Headline style={{ color: "#147efb" }}>{"₹" + data.fee.online}</Headline>
+                                <Subheading style={{ fontWeight: 'bold' }} >Online</Subheading>
+                            </View>
+                            <View style={{ ...styles.ratingViewButton, marginLeft: 6, backgroundColor: "#e3f2fd" }}>
+                                <View style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} >
+
+                                    <Headline style={{ color: "#147efb" }}>{"₹" + data.fee.offline}</Headline>
+
+                                </View>
+                                <Subheading style={{ fontWeight: 'bold' }} >Offline</Subheading>
+                            </View>
+                        </View>
                         <Subheading style={{ fontSize: 20, fontWeight: "bold", marginTop: 0, paddingTop: 0 }}>Reviews</Subheading>
                         {/* <Paragraph>{JSON.stringify(reviews[0])}</Paragraph> */}
                         {reviewsLoading ?
@@ -257,14 +272,14 @@ function DocDetails(props) {
                             :
                             <View style={styles.reviewsDiv}>
                                 {reviews.map((review, index) => {
-                                    if(index===4){
+                                    if (index === 4) {
                                         return null
                                     }
                                     return <Review data={review} index={index} key={index.toString()} totalLength={reviews.length} />
                                 })}
 
                                 {reviews.length > 4 &&
-                                    <TouchableOpacity style={styles.showMoreButton} onPress={()=>{props.navigation.navigate('DocReviewsAll', { data: data })}}><Paragraph style={{ color: '#147efb', fontWeight: "bold" }} >Show More</Paragraph></TouchableOpacity>
+                                    <TouchableOpacity style={styles.showMoreButton} onPress={() => { props.navigation.navigate('DocReviewsAll', { data: data }) }}><Paragraph style={{ color: '#147efb', fontWeight: "bold" }} >Show More</Paragraph></TouchableOpacity>
                                 }
                             </View>
                         }
@@ -274,23 +289,23 @@ function DocDetails(props) {
                 </View>
 
             </ScrollView>
-            <Button mode="contained" style={styles.button} contentStyle={{ height: 48 }} color="#147EFB" onPress={() => {props.navigation.navigate('AppointmentBooking', { data: data }) }}>Book Appointment</Button>
+            <Button disabled={!data.status} mode="contained" style={styles.button} labelStyle={{ color: !data.status ? "red" : "#fff" }} contentStyle={{ backgroundColor: !data.status ? "#eee" : "#147efb", height: 48 }} color="#147EFB" onPress={() => { props.navigation.navigate('AppointmentBooking', { data: data }) }}>{data.status ? "Book Appointment" : "Doctor currently not available"}</Button>
             <Modalize
                 ref={giveReviewModal}
                 adjustToContentHeight={true}
                 modalStyle={styles.modal}
                 handleStyle={{ backgroundColor: '#147efb' }}
                 rootStyle={{ elevation: 10 }}
-                onClose={()=>{setyourRating(2.5);setyourReview('')}}
+                onClose={() => { setyourRating(2.5); setyourReview('') }}
             >
-                <Subheading style={{ fontWeight: "bold",color:'#f1c40f',alignSelf:"center" }}>Your Rating</Subheading>
+                <Subheading style={{ fontWeight: "bold", color: '#f1c40f', alignSelf: "center" }}>Your Rating</Subheading>
 
                 <Rating
-                    style={{marginBottom:15}}
+                    style={{ marginBottom: 15 }}
                     minValue={1}
                     startingValue={2.5}
                     jumpValue={0.5}
-                    onFinishRating={rating=>{
+                    onFinishRating={rating => {
                         setyourRating(rating)
                     }}
                 />

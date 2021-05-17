@@ -90,9 +90,9 @@ function Settings(props) {
                                     left={() => <List.Icon icon="at" color="#147efb" />}
                                 />
                                 <List.Item
-                                    onPress={() => { }}
+                                    onPress={() => { props.navigation.navigate("MedicalRecords") }}
                                     style={styles.listItem}
-                                    title="Medical History"
+                                    title="Medical Records"
                                     right={() => <List.Icon icon="chevron-right-circle" color="#147efb" />}
                                     left={() => <List.Icon icon="medical-bag" color="#147efb" />}
                                 />

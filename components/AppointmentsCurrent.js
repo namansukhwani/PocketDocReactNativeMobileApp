@@ -8,19 +8,18 @@ import { } from '../redux/ActionCreators';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import moment from 'moment';
-//import Animated from 'react-native-reanimated';
 import Fontisto from 'react-native-vector-icons/Fontisto';
-import firestore from '@react-native-firebase/firestore';
 import Spinner from 'react-native-spinkit';
 import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { EventRegister } from 'react-native-event-listeners';
 
 const height = Dimensions.get('screen').height;
+const todayDate = new Date();
 
 //redux
 const mapStateToProps = state => {
     return {
-        user: state.user
+        user: state.user,
+        appointments: state.appointmentesCurrent,
     };
 };
 
@@ -32,7 +31,6 @@ const mapDispatchToProps = (dispatch) => ({
 function AppointmentsCurrent(props) {
 
     //ref
-    const animatedView = useRef(0);
 
     //Animated 
     const scrollY = new Animated.Value(0);
@@ -43,9 +41,6 @@ function AppointmentsCurrent(props) {
     })
 
     //states
-    const todayDate = new Date();
-    const [appointmentData, setAppointmentData] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     //lifecycles
     useFocusEffect(
@@ -56,51 +51,11 @@ function AppointmentsCurrent(props) {
 
     useEffect(() => {
 
-        const logout=EventRegister.addEventListener('logout',()=>{
-            unsubscribe();
-        })
+        // console.log(props.appointments.appointments);
 
-        const unsubscribe = firestore().collection("appointments")
-            .where('userId', '==', auth().currentUser.uid)
-            .orderBy('dateUpdated', 'desc')
-            .onSnapshot(async querySnapshot => {
-
-                const threads = await Promise.all(querySnapshot.docs.map(async documentSnapshot => {
-                    const docData = await firestore().collection("doctors").doc(documentSnapshot.data().doctorId).get();
-                    return {
-                        appointmentDocs: documentSnapshot.data().appointmentDocs,
-                        dateCreated: documentSnapshot.data().dateCreated,
-                        dateUpdated: documentSnapshot.data().dateUpdated,
-                        doctorId: docData.data(),
-                        id: documentSnapshot.id,
-                        prescription: documentSnapshot.data().prescription,
-                        problem: documentSnapshot.data().problem,
-                        status: documentSnapshot.data().status,
-                        time: documentSnapshot.data().time,
-                        type: documentSnapshot.data().type,
-                        userId: documentSnapshot.data().userId
-                    }
-                }));
-                setAppointmentData(threads);
-                if (loading) { setLoading(false) }
-                //console.log("Appointment Data",threads);
-            })
-
-        return () => {
-            unsubscribe();
-            EventRegister.removeEventListener(logout);
-        };
     }, []);
 
     //methods
-
-    async function getDocData(id) {
-        await firestore().collection("doctors").doc(id).get()
-            .then(data => {
-                return data.data()
-            })
-            .catch(err => console.log(err));
-    }
 
     const CardView = ({ item, index }) => {
 
@@ -135,15 +90,15 @@ function AppointmentsCurrent(props) {
         }
 
         return (
-            <Animatable.View animation="slideInUp" style={{ marginBottom: 10 }} duration={500} delay={100} useNativeDriver={true}>
-                <Card style={styles.card} onPress={() => { }} >
+            <Animatable.View key={index.toString()} animation="slideInUp" style={{ marginBottom: 10 }} duration={500} delay={100} useNativeDriver={true}>
+                <Card style={styles.card} onPress={() => { props.navigation.navigate('AppointmentDetails', { data: item }) }} >
                     <Card.Content style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
                         <View style={{ flexDirection: "row" }}>
                             <Fontisto name="doctor" size={30} style={{ margin: 5, marginRight: 10, alignSelf: "center" }} color="#147efb" />
-                            <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.doctorId.name}</Title>
+                            <Title style={{ paddingVertical: 0, alignSelf: "center", marginVertical: 0, flex: 1 }}>{item.doctorData.name}</Title>
 
                         </View>
-                        <Caption style={{ marginVertical: 0, padding: 0,textTransform:"capitalize"}}>{item.doctorId.specializations}</Caption>
+                        <Caption style={{ marginVertical: 0, padding: 0, textTransform: "capitalize" }}>{item.doctorId.specializations}</Caption>
                         <View style={{ width: '60%' }}>
                             <Paragraph numberOfLines={1} style={{ overflow: "hidden", }}>{item.problem}</Paragraph>
                         </View>
@@ -164,17 +119,17 @@ function AppointmentsCurrent(props) {
         <View style={{ flex: 1, backgroundColor: "#fff", }}>
             <StatusBar backgroundColor="#fff" barStyle="dark-content" />
 
-            {loading ?
+            {props.appointments.isLoading ?
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <Spinner
                         type="Wave"
                         color="#147efb"
-                        isVisible={loading}
+                        isVisible={true}
                         size={50}
                     />
                 </View>
                 :
-                (appointmentData.length === 0 ?
+                (props.appointments.appointments.length === 0 ?
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         <ComunityIcon name='calendar-alert' size={80} color="#147efb" />
                         <Subheading style={{}}>No Current Appointments.</Subheading>
@@ -182,7 +137,7 @@ function AppointmentsCurrent(props) {
                     :
                     <>
                         <Animated.FlatList
-                            data={appointmentData}
+                            data={props.appointments.appointments}
                             renderItem={CardView}
                             keyExtractor={(item, index) => index.toString()}
                             contentContainerStyle={{ paddingHorizontal: 15, marginTop: 10, paddingBottom: 24 }}

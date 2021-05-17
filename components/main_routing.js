@@ -33,6 +33,10 @@ import NewAppointment from './NewAppointment';
 import DocDetails from './DocDetails';
 import AppointmentBooking from './AppointmentBooking';
 import DocReviewsAll from './DocReviewsAll';
+import AppointmentDetails from './AppointmentDetails';
+import MedicalRecords from './MedicalRecords';
+import PrescriptionView from './PrescriptionView';
+import AllPrescriptions from './AllPrescriptions';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -391,11 +395,11 @@ export default function Main() {
                         //headerShown:false,
                         headerTitle: '',
                         headerTitleAlign: 'center',
-                        headerTransparent:true,
+                        headerTransparent: true,
                         headerStyle: {
                             elevation: 0,
                             height: 40,
-                            backgroundColor:'transparent'
+                            backgroundColor: 'transparent'
                         },
                         headerLeft: () => (
                             <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
@@ -414,7 +418,7 @@ export default function Main() {
                         headerStyle: {
                             elevation: 0,
                             height: 40,
-                            backgroundColor:'#fff'
+                            backgroundColor: '#fff'
                         },
                         headerLeft: () => (
                             <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
@@ -433,7 +437,7 @@ export default function Main() {
                         headerStyle: {
                             elevation: 0,
                             height: 40,
-                            backgroundColor:'#fff'
+                            backgroundColor: '#fff'
                         },
                         headerLeft: () => (
                             <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
@@ -442,6 +446,72 @@ export default function Main() {
                         ),
                     })}
                     component={AppointmentBooking}
+                />
+                <Stack.Screen
+                    name="AppointmentDetails"
+                    options={({ route, navigation }) => ({
+                        //headerShown:false,
+                        headerTitle: '',
+                        headerTitleAlign: 'center',
+                        headerTransparent: true,
+
+                        headerLeft: () => (
+                            <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
+                                <Icon name="chevron-back" size={30} onPress={() => navigation.goBack()} />
+                            </TouchableOpacity>
+                        ),
+                    })}
+                    component={AppointmentDetails}
+                />
+
+                <Stack.Screen
+                    name="MedicalRecords"
+                    options={({ route, navigation }) => ({
+                        //headerShown:false,
+                        headerTitle: 'Medical Records',
+                        headerTitleAlign: 'center',
+                        headerStyle: {
+                            elevation: 0,
+                            backgroundColor: '#fff'
+                        },
+                        headerLeft: () => (
+                            <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
+                                <Icon name="chevron-back" size={30} onPress={() => navigation.goBack()} />
+                            </TouchableOpacity>
+                        ),
+                    })}
+                    component={MedicalRecords}
+                />
+                <Stack.Screen
+                    name="PrescriptionView"
+                    options={({ route, navigation }) => ({
+                        headerTitle: '',
+                        headerTitleAlign: 'center',
+                        headerTransparent: true,
+                        headerLeft: () => (
+                            <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
+                                <Icon name="chevron-back" size={30} onPress={() => navigation.goBack()} />
+                            </TouchableOpacity>
+                        ),
+                    })}
+                    component={PrescriptionView}
+                />
+                <Stack.Screen
+                    name="AllPrescription"
+                    options={({ route, navigation }) => ({
+                        headerTitle: 'Prescriptions',
+                        headerTitleAlign: 'center',
+                        headerStyle: {
+                            elevation: 0,
+                            backgroundColor: '#fff'
+                        },
+                        headerLeft: () => (
+                            <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.goBack()}>
+                                <Icon name="chevron-back" size={30} onPress={() => navigation.goBack()} />
+                            </TouchableOpacity>
+                        ),
+                    })}
+                    component={AllPrescriptions}
                 />
             </Stack.Navigator>
         </NavigationContainer>
