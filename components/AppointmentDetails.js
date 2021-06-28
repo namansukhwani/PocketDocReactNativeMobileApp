@@ -17,7 +17,7 @@ import Spinner from 'react-native-spinkit';
 const AppointmentDetails = (props) => {
 
     //consts
-    const data = props.route.params.data;
+    const [data, setdata] = useState(props.route.params.data);
     const address = data.doctorData.address + ', ' + (data.doctorData.city === '' ? '' : data.doctorData.city + ', ') + (data.doctorData.state === '' ? '' : data.doctorData.state + ', ') + data.doctorData.pincode + (data.doctorData.landmark === '' ? '' : ', near ' + data.doctorData.landmark);
 
     //refs
@@ -172,6 +172,33 @@ const AppointmentDetails = (props) => {
         }
     }
 
+    const cancelAppointment = () => {
+        const updateData = {
+            status: 'declined'
+        }
+
+        firestore().collection('appointments').doc(data.id).update(updateData)
+            .then(() => {
+                firestore().collection('appointments').doc(data.id).get()
+                    .then(query => {
+                        setdata({
+                            id: query.id,
+                            doctorData: data.doctorData,
+                            ...query.data()
+                        })
+
+                    })
+                    .catch(err => {
+                        ToastAndroid.show("Unable to update this appointment", ToastAndroid.SHORT)
+                        console.log(err);
+                    })
+            })
+            .catch(err => {
+                ToastAndroid.show("Unable to cancel this appointment", ToastAndroid.SHORT)
+                console.log(err);
+            })
+    }
+
     const uploadReport = () => {
         const utility = new Utility();
         utility.checkNetwork()
@@ -275,33 +302,26 @@ const AppointmentDetails = (props) => {
                                 onPress={() => { Linking.openURL(`tel:+91${data.doctorData.phoneNo}`) }}
                             />
                         </View>
-                        {/* <View style={{ justifyContent: "center", alignItems: "center", borderRadius: 50, backgroundColor: "#fff", marginLeft: 12 }}> */}
-                        <IconButton
-                            icon="email"
-                            style={{ backgroundColor: "#e3f2fd", elevation: 2 }}
-                            color="#147efb"
-                            size={35}
-                            onPress={() => { Linking.openURL(`mailto:${data.doctorData.email}`) }}
-                        />
-                        {/* </View> */}
+                        <View style={{ justifyContent: "center", alignItems: "center", borderRadius: 50, backgroundColor: "#fff", marginLeft: 12 }}>
+                            <IconButton
+                                icon="email"
+                                style={{ backgroundColor: "#e3f2fd", elevation: 2 }}
+                                color="#147efb"
+                                size={35}
+                                onPress={() => { Linking.openURL(`mailto:${data.doctorData.email}`) }}
+                            />
+                        </View>
                     </View>
                 </Animatable.View>
                 <Animatable.View style={{ paddingHorizontal: 15, paddingBottom: 15 }} animation="slideInUp" duration={500} useNativeDriver={true}>
                     <Text style={{ fontSize: 30, fontWeight: "bold", marginBottom: 5 }}>{data.doctorData.name}</Text>
                     <Subheading style={styles.sep}>{data.doctorData.specializations}</Subheading>
                     {/* <View style={{ flexDirection: 'row' }}> */}
-                    <View style={styles.address}>
+                    <TouchableOpacity style={styles.address} onPress={() => { Linking.openURL(`geo:0,0?q=${address}`) }} activeOpacity={1}>
                         <MaterialIcon name="location-on" size={20} color="#147efb" />
                         <Paragraph style={{ color: '#147efb' }} >{address}</Paragraph>
-                        <IconButton
-                            icon="directions"
-                            style={{ backgroundColor: "#e3f2fd", elevation: 2 }}
-                            color="#147efb"
-                            size={45}
-                            onPress={() => { Linking.openURL(`geo:0,0?q=${address}`) }}
-                        />
-                    </View>
-
+                    </TouchableOpacity>
+                    <Caption>Press on address for directions</Caption>
                     {/* </View> */}
 
                     <Subheading style={{ fontWeight: "bold", marginTop: 8, marginBottom: 4 }}>Appointment ID</Subheading>
@@ -416,8 +436,8 @@ const AppointmentDetails = (props) => {
                         <>
                             <View style={{ backgroundColor: "#e3f2fd", height: 1, marginTop: 10, marginBottom: 10 }} />
 
-                            <Button mode="outlined" style={{ borderRadius: 15, marginBottom: 10 }} contentStyle={{ height: 48 }} color="#147EFB" onPress={() => { }}>Reschedule Appointment</Button>
-                            <Button mode="outlined" style={{ borderRadius: 15 }} contentStyle={{ height: 48 }} color="red" onPress={() => { }}>Cancel Appointment</Button>
+                            {/* <Button mode="outlined" style={{ borderRadius: 15, marginBottom: 10 }} contentStyle={{ height: 48 }} color="#147EFB" onPress={() => { }}>Reschedule Appointment</Button> */}
+                            {data.status !== "accepted" && <Button mode="outlined" style={{ borderRadius: 15 }} contentStyle={{ height: 48 }} color="red" onPress={() => { cancelAppointment() }}>Cancel Appointment</Button>}
                         </>
                     }
 
